@@ -1,4 +1,8 @@
-from PyQt6 import QtWidgets
+# App import
+import sys
+from packages.app import app
 
+
+# Main run line
 if __name__ == "__main__":
-    pass
+    sys.exit(app.exec())
