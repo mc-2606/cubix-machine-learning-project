@@ -1,9 +1,11 @@
 # Module imports imports
-from cv2 import VideoCapture, cvtColor, COLOR_BGR2RGB, flip
-from PyQt6.QtWidgets import QLabel, QWidget, QVBoxLayout
-from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from cv2 import VideoCapture
+from PyQt6.QtWidgets import QLabel, QWidget, QVBoxLayout, QPushButton, QMessageBox
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QPixmap, QImage
 
+# Importing other important modules
+from packages.modules.scan import convertimage_qt
 
 class ImageThread(QThread):
     image_update = pyqtSignal(QImage)
@@ -20,31 +22,15 @@ class ImageThread(QThread):
 
             # If camera is present
             if ret:
-                # Preparing images for PyQT integration
-                image = cvtColor(frame, COLOR_BGR2RGB)
-                flipped_image = flip(image, 1)
+                # Emitting the image
+                converted_image = convertimage_qt(frame)
+                self.image_update.emit(converted_image)
 
-                # Formatting metadata
-                image_data = flipped_image.data
-                width = flipped_image.shape[1]
-                height = flipped_image.shape[0]
-                
-                # Image conversion
-                qt_conv = QImage(image_data,
-                                 width,
-                                 height,
-                                 QImage.Format.Format_RGB888)
-
-                qt_image = qt_conv.scaled(640, 480, Qt.AspectRatioMode.KeepAspectRatio)
-
-                # Emitting a 'signal' to update image_update
-                self.image_update.emit(qt_image)
-            
             # If no camera present
             else:
                 raise Exception("[ERROR] Cannot locate camera video device")
 
-    # To stop thread process
+    # To stop thread process omgg slay
     def stop(self):
         self.thread_active = False
         self.quit()
@@ -55,21 +41,56 @@ class ScanWindow(QWidget):
     # OOP inheritance from QMainWindow
     def __init__(self):
         super(ScanWindow, self).__init__()
-        
-        # Setting a 'test' title
-        self.setWindowTitle("CUBIX")
+
+        self.SCAN_ORDER = [
+            "White",
+            "Red",
+            "Green",
+            "Orange",
+            "Blue",
+            "Yellow"
+        ]
 
         # Setting out main widgets
         self.layout = QVBoxLayout()
         self.view_finder = QLabel()
-        self.layout.addWidget(self.view_finder)
+        self.scan_side = QLabel()
+
+        # Allow permission button
+        self.permission_button = QPushButton()
+        self.permission_button.setText("Allow permission")
+        self.permission_button.clicked.connect(self.allow_camera_permission)
+
+        # Do not allow permission button
+        self.no_permission_button = QPushButton()
+        self.no_permission_button.setText("No permission")
+        self.no_permission_button.clicked.connect(self.no_camera_permission)
+
+        # Permission Prompt
+        self.permission_prompt = QLabel()
+        self.permission_prompt.setText("Request permission to use camera")
+
+        # Which side to currently scan + scanned sides
+        self.current_scan = 0
+        self.current_side = QLabel()
+        self.current_side.setText(self.SCAN_ORDER[self.current_scan])
+        
+        self.scanned = ""
+        self.scanned_sides = QLabel()
         
         # The image thread -> outputs are fed into the view_finder
         self.image_thread = ImageThread()
-        self.image_thread.image_update.connect(self.update_fiewfinder)
+    
+    # Updates the scanned sides
+    def increment_scan(self):
+        if self.current_scan < 5:
+            self.current_scan += 1
 
-        # Setting out the layout
-        self.setLayout(self.layout)
+            side = self.SCAN_ORDER[self.current_scan]
+            self.scanned += (", " + side)
+
+            self.current_side.setText(side)
+            self.scanned_sides.setText(self.scanned) 
     
     # Feeds the image to view_finder to be displayed
     def update_fiewfinder(self, image):
@@ -80,4 +101,38 @@ class ScanWindow(QWidget):
     def start_viewfinder_thread(self):
         self.image_thread.start()
         self.image_thread.image_update.connect(self.update_fiewfinder)
+    
+    # Removing startup widgets
+    def remove_application_startup(self):
+        self.layout.removeWidget(self.permission_prompt)
+        self.layout.removeWidget(self.permission_button)
+        self.layout.removeWidget(self.no_permission_button)
+    
+    # Adding startup widgets
+    def application_startup(self):
+        # Adding the startup widgets
+        self.layout.addWidget(self.permission_prompt)
+        self.layout.addWidget(self.permission_button)
+        self.layout.addWidget(self.no_permission_button)
 
+        # Setting out the app configs
+        self.setLayout(self.layout)
+        self.setWindowTitle("CUBIX")
+    
+    # When permission to use camera allowed
+    def allow_camera_permission(self):
+        # Removing the initial prompts
+        self.remove_application_startup()
+
+        # Adding viewfinder
+        self.layout.addWidget(self.view_finder)
+        self.start_viewfinder_thread()
+    
+    # When permission is not allowed
+    def no_camera_permission(self):
+        # Creating message window
+        message = QMessageBox()
+        message.setText("Important")
+        message.setInformativeText("You need to use a camera for this application!")
+
+        message.exec()

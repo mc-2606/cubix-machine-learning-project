@@ -9,5 +9,5 @@ app = QApplication([])
 
 # Adding scan window
 scan_window = ScanWindow()
-scan_window.start_viewfinder_thread()
+scan_window.application_startup()
 scan_window.show()
