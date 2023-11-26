@@ -73,22 +73,27 @@ class ScanWindow(QWidget):
         # Which side to currently scan + scanned sides
         self.current_scan = 0
         self.current_side = QLabel()
-        self.current_side.setText(self.SCAN_ORDER[self.current_scan])
+        self.current_side.setText("Scan: " + self.SCAN_ORDER[self.current_scan])
         
-        self.scanned = ""
+        self.scanned = "Scanned sides: "
         self.scanned_sides = QLabel()
+        self.scanned_sides.setText(self.scanned)
         
         # The image thread -> outputs are fed into the view_finder
         self.image_thread = ImageThread()
     
     # Updates the scanned sides
     def increment_scan(self):
+        # Whilst the scans are less than 6 (comparing the index)
         if self.current_scan < 5:
+            # Incrementing scan
             self.current_scan += 1
 
-            side = self.SCAN_ORDER[self.current_scan]
+            # Updating variables
+            side = "Scan: " + self.SCAN_ORDER[self.current_scan]
             self.scanned += (", " + side)
 
+            # Updating widget text
             self.current_side.setText(side)
             self.scanned_sides.setText(self.scanned) 
     
@@ -104,13 +109,13 @@ class ScanWindow(QWidget):
     
     # Removing startup widgets
     def remove_application_startup(self):
-        self.layout.removeWidget(self.permission_prompt)
-        self.layout.removeWidget(self.permission_button)
-        self.layout.removeWidget(self.no_permission_button)
+        self.permission_prompt.setParent(None)
+        self.permission_button.setParent(None)
+        self.no_permission_button.setParent(None)
     
     # Adding startup widgets
     def application_startup(self):
-        # Adding the startup widgets
+        # Adding widgets
         self.layout.addWidget(self.permission_prompt)
         self.layout.addWidget(self.permission_button)
         self.layout.addWidget(self.no_permission_button)
@@ -119,15 +124,20 @@ class ScanWindow(QWidget):
         self.setLayout(self.layout)
         self.setWindowTitle("CUBIX")
     
+    # Adds the scan widgets
+    def add_scan_widgets(self):
+        # Adding widgets
+        self.layout.addWidget(self.current_side)
+        self.layout.addWidget(self.scanned_sides)
+        self.layout.addWidget(self.view_finder)
+    
     # When permission to use camera allowed
     def allow_camera_permission(self):
-        # Removing the initial prompts
-        self.remove_application_startup()
-
-        # Adding viewfinder
-        self.layout.addWidget(self.view_finder)
+        # Removing prompts and adding camera threads
         self.start_viewfinder_thread()
-    
+        self.remove_application_startup()
+        self.add_scan_widgets()
+        
     # When permission is not allowed
     def no_camera_permission(self):
         # Creating message window
