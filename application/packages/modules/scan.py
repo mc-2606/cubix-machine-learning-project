@@ -4,7 +4,7 @@ from cv2 import cvtColor, COLOR_BGR2RGB, flip, inRange, rectangle, resize
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QImage
 
-
+# Defining Colour Ranges
 COLOUR_RANGES = {
     'white': {
         'lower': array([0, 0, 200]),
@@ -32,17 +32,53 @@ COLOUR_RANGES = {
     }
 }
 
-GRID_POSITIONS = [(80, 80), (240, 80), (400, 80), (80, 240), (240, 240), (400, 240), (80, 400), (240, 400), (400, 400)]
+# How far apart grid spaces should be
+GRID_SPACING = 160
+RECT_WIDTH = 10
+RECT_COLOUR = (255, 255, 255)
 
-def draw_rectangles(frame):
-    for position in GRID_POSITIONS:
-        rectangle(frame, (position[0] - 10, position[1] - 10), (position[0] + 10, position[1] + 10), (255, 255, 255), -1)
+
+# Draws the rectangles onto the frame
+def draw_rectangles(frame, grid_positions):
+    # Iterating over grid positions
+    for position in grid_positions:
+
+        # Adding 10 px to the top left/right of the positions as rectangle draws from corner points
+        rectangle(frame,
+                  (position[0] - RECT_WIDTH, position[1] - RECT_WIDTH),
+                  (position[0] + RECT_WIDTH, position[1] + RECT_WIDTH),
+                  RECT_COLOUR,
+                  -1)
+
+# Generates the relative grid positions
+def generate_grid_positions(width, height):
+    # Getting centre positions
+    centre_x = width // 2
+    centre_y = height // 2
+
+    # Grid positions
+    grid_positions = []
+
+    # Iterating 3 times, but adding i and j respective amounts of grid spacing
+    for i in range(1, -2, -1):
+        for j in range(-1, 2, 1):
+            # Getting new grid coords
+            coord_x = int(centre_x + (i * GRID_SPACING))
+            coord_y = int(centre_y + (j * GRID_SPACING))
+            
+            # Adding to grid positions
+            grid_positions.append((coord_x, coord_y))
+    
+    # Returning grid 
+    print(grid_positions)
+    return grid_positions
 
 # Prepares image for PyQT conversion
-def convertimage_qt(frame):
+def convertimage_qt(frame, grid_positions):
+    # Drawing grids
+    draw_rectangles(frame, grid_positions)
+
     # Preparing images for PyQT integration
-    resize(frame, (480, 480))
-    draw_rectangles(frame)
     image = cvtColor(frame, COLOR_BGR2RGB)
     flipped_image = flip(image, 1)
 

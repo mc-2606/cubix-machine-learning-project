@@ -1,12 +1,14 @@
 # Module imports imports
-from cv2 import VideoCapture
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT
 from PyQt6.QtWidgets import QLabel, QWidget, QVBoxLayout, QPushButton, QMessageBox
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QPixmap, QImage
 
 # Importing other important modules
-from packages.modules.scan import convertimage_qt
+from packages.modules.scan import convertimage_qt, generate_grid_positions
 
+
+# Thread handler
 class ImageThread(QThread):
     image_update = pyqtSignal(QImage)
 
@@ -14,23 +16,28 @@ class ImageThread(QThread):
     def run(self):
         self.thread_active = True
 
-        # Capturing video
+        # Capturing video + metadata
         capture = VideoCapture(0)
+        width = capture.get(CAP_PROP_FRAME_WIDTH)
+        height = capture.get(CAP_PROP_FRAME_HEIGHT)
 
         while self.thread_active:
             ret, frame = capture.read()
 
             # If camera is present
             if ret:
+                # Image prep
+                grid_positions = generate_grid_positions(width, height)
+                converted_image = convertimage_qt(frame, grid_positions)
+
                 # Emitting the image
-                converted_image = convertimage_qt(frame)
                 self.image_update.emit(converted_image)
 
             # If no camera present
             else:
                 raise Exception("[ERROR] Cannot locate camera video device")
 
-    # To stop thread process omgg slay
+    # To stop thread process
     def stop(self):
         self.thread_active = False
         self.quit()

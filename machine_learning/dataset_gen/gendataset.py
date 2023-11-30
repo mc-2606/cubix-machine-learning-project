@@ -1,10 +1,13 @@
+# Pycuber imports
 from pycuber import Cube, Formula
 from pycuber.solver import CFOPSolver
+
+# Using multiprocessing as performance is considerably better
 from multiprocessing import Process
 import datetime
 
-solvedToken = "S"
-newToken = "$"
+SOLVED_TOKEN = "S"
+NEW_TOKEN = "$"
 
 numVals = {
     "white": 0,
@@ -15,7 +18,7 @@ numVals = {
     "yellow": 5
 }
 
-SOLUTIONSNUMBER = 10000
+SOLUTIONS_NUMBER = 10000
 
 
 def convertColoursToNums(cube:list):
@@ -86,31 +89,21 @@ def generateFile(filenumber):
         tempCube(move)
 
     writeToFile(scrambleFile, constructValidCube(tempCube))
-    writeToFile(solutionsFile, solvedToken)
+    writeToFile(solutionsFile, SOLVED_TOKEN)
 
-    writeToFile(scrambleFile, newToken)
-    writeToFile(solutionsFile, newToken)
-
-# Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix} ~ {iteration}/{total}', end = printEnd)
-    # Print New Line on Complete
-    if iteration == total: 
-        print("\n")
-
+    writeToFile(scrambleFile, NEW_TOKEN)
+    writeToFile(solutionsFile, NEW_TOKEN)
 
 def generateDataset(fileNumber):
     print(f"[{datetime.datetime.now()}] Generating dataset ~ Dataset No:{fileNumber}")
 
-    for count in range(SOLUTIONSNUMBER):
+    for count in range(SOLUTIONS_NUMBER):
         generateFile(fileNumber)
 
     print(f"[{datetime.datetime.now()}] DATASET GENERATED ~ Dataset No:{fileNumber}")  
 
-def createTargetprocesses(amount):
+# Creates the amount of targetted threads/processes
+def create_target_process(amount):
     processes = []
     for i in range(amount):
         processes.append(Process(target=generateDataset, args=(i+1,)))
@@ -118,10 +111,11 @@ def createTargetprocesses(amount):
     return processes
             
 
+# Main run line
 if __name__ == "__main__":
     threadCount = input("thread no: ")
 
-    processes = createTargetprocesses(int(threadCount))
+    processes = create_target_process(int(threadCount))
 
     for process in processes:
         process.start()
