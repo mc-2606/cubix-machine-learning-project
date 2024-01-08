@@ -70,8 +70,8 @@ def load_training_data(file_no: int):
     target_solutions = f"{DATASET_PATH}solutions{file_no}.txt"
     
     # Gathering the files
-    target_scramble_data = format_file(target_scramble, limit=1000)
-    target_solutions_data = format_file(target_solutions, limit=1000)
+    target_scramble_data = format_file(target_scramble, limit=600000)
+    target_solutions_data = format_file(target_solutions, limit=600000)
 
 
     # Ready formatted data
@@ -104,15 +104,13 @@ labels_train = label_encode(test2[2])
 labels_val = label_encode(test2[3])
 
 
-
-
 model = Model(hidden_layer_count=4, 
               layer_sizes=[INPUT_NEURON_COUNT, 1024, 2048, 1024],
               output_neuron_count=OUTPUT_NEURONS_COUNT,
               hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
               output_activation_func=OUTPUT_ACTIVATION_FUNC, 
               metrics=['val_accuracy'],
-              learning_rate=0.03)
+              learning_rate=0.0003)
 
 model.build_model()
 model.build_optimiser()

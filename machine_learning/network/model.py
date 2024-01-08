@@ -5,6 +5,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.losses import SparseCategoricalCrossentropy
 from matplotlib import pyplot as plt
+import tensorflow
 
 from datetime import datetime
 from json import dump, load
@@ -78,14 +79,13 @@ class Model:
     def build_checkpoint(self, epochs:int):
         # Fetching current time and logging variables
         current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        path_name = f"{current_time}.ckpt"
+        path_name = f"network/checkpoint/checkpoint_files{current_time}.ckpt"
         
         # Creating the checkpoint callback
         self.checkpoint_callback = ModelCheckpoint(filepath=path_name,
-                                     verbose=1, # Set on logging for testing purposes
+                                     verbose=2, # Set on logging for testing purposes
                                      save_best_only=True,
-                                     save_freq=epochs,
-                                     monitor=self.metrics) 
+                                     save_freq=epochs,) 
         
     
     # Constructs the layers into the model
