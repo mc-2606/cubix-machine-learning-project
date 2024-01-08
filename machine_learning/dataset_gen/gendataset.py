@@ -141,7 +141,7 @@ def generate_dataset(fileNumber):
     # End time
     print(f"[{datetime.datetime.now()}] DATASET GENERATED ~ Dataset No:{fileNumber}")  
 
-# Creates the amount of targetted threads/processes
+# Creates the amount of targeted threads/processes
 def create_target_process(amount):
     # List of threads/processes
     processes = []
@@ -159,10 +159,10 @@ def create_target_process(amount):
 # Main run line
 if __name__ == "__main__":
     # If I ever need to change the amount of threads
-    threadCount = int(input("thread no: "))
+    process_count = int(input("Process Count: "))
 
     # Creating the target processes
-    processes = create_target_process(threadCount)
+    processes = create_target_process(process_count)
 
     # Starting each process (i.e each pair of file creation)
     for process in processes:
