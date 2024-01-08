@@ -111,8 +111,10 @@ class Model:
         self.model.compile(optimizer=self.optimiser,
                            loss=self.loss_function,
                            metrics=["accuracy",])
-        
+    
+    # 
     def train(self, features_train, features_validate, labels_train, labels_validate, epochs):
+        # Training the model with input data
         history = self.model.fit(
             x=features_train,
             y=labels_train,
@@ -121,13 +123,20 @@ class Model:
             callbacks=self.checkpoint_callback
         )
 
-        print(history.history['accuracy'])
+        # Returning the history object
+        return history
 
+    def plot_history(self, history):
+        # Plotting down the variabes
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
+
+        # Setting meta data
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'val'], loc='upper left')
+
+        # Plotting data
         plt.show()
 
