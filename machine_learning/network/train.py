@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from model import Model
 
+
 # Constants
 DATASET_PATH = "dataset_gen/datasets/"
 FILESIZE = 10000
@@ -74,6 +75,7 @@ def format_sols_tolst(data):
     # Return the new list
     return data
 
+
 # Loads all of the training data
 def load_training_data(file_no: int, limit=100):
     # Gathers the required file names
@@ -93,8 +95,10 @@ def load_training_data(file_no: int, limit=100):
 
 # Splits up data into training and valid datasets
 def split_train_valid(features, labels, valid_size, random_state):
+    # Using sklearn to split up the data
     x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size, random_state=random_state)
 
+    # Returning the training and validation data
     return x_train, x_val, y_train, y_val
 
 # Encodes the labels into numerical integers
@@ -109,10 +113,10 @@ def label_encode(target:list):
     return data
 
 # Function for the first initial test (batch)
-def initial_test_batch(batchsize):
+def initial_test_batch(batchsize:int):
     # Splitting up data into training and validating batches
     batch = load_training_data(file_no=1, limit=batchsize)
-    split_batch = split_train_valid(batch[0], batch[1], 0.2, 69)
+    split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
     
     # Splitting up batch into features and labels
     features_train = split_batch[0]
@@ -126,15 +130,49 @@ def initial_test_batch(batchsize):
               output_neuron_count=OUTPUT_NEURONS_COUNT,
               hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
               output_activation_func=OUTPUT_ACTIVATION_FUNC, 
-              metrics=['val_accuracy'],
+              metrics=['accuracy ','val_accuracy'],
               learning_rate=0.0003)
     
     # Initialising model
     model.build_model()
     model.build_optimiser()
-    model.build_checkpoint(epochs=EPOCHS)
+    model.build_checkpoint()
+    model.compile_model()
+
+    # Training model + getting results
+    evals = model.train(features_train, features_val, labels_train, labels_val, epochs=3)
+    model.plot_history(evals)
+
+
+def further_train_model(batchsize, file_no, date):
+    # Splitting up data into training and validating batches
+    batch = load_training_data(file_no=file_no, limit=batchsize)
+    split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
+    
+    # Splitting up batch into features and labels
+    features_train = split_batch[0]
+    features_val = split_batch[1]
+    labels_train = label_encode(split_batch[2])
+    labels_val = label_encode(split_batch[3])
+
+    # Creating the model
+    model = Model(hidden_layer_count=4, 
+              layer_sizes=[INPUT_NEURON_COUNT, 1024, 2048, 1024],
+              output_neuron_count=OUTPUT_NEURONS_COUNT,
+              hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
+              output_activation_func=OUTPUT_ACTIVATION_FUNC, 
+              metrics=['accuracy', 'val_accuracy'],
+              learning_rate=0.0003)
+    
+    # Initialising model
+    model.build_model()
+    #model.load_model(f"network/checkpoints/checkpoint_files/{date}.ckpt")
+    model.load_model(f"network/checkpoint/checkpoint_files/{date}.ckpt")
+    model.build_checkpoint()
     model.compile_model()
 
     # Training model + getting results
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
     model.plot_history(evals)
+
+further_train_model(batchsize=100000, date="20240111-143648", file_no=10)

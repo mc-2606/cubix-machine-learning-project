@@ -1,17 +1,18 @@
-# Importing modules
+# Importing machine learning modules
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras.losses import SparseCategoricalCrossentropy
 from matplotlib import pyplot as plt
-import tensorflow
 
+
+# File saving
 from datetime import datetime
 from json import dump, load
 
 # CONSTANTS
-CHECKPOINT_PATH_TF = "network/checkpoints/checkpoint_files/"
+CHECKPOINT_PATH_TF = "network/checkpoint/checkpoint_files/"
 
 # The Model Handler
 class Model:
@@ -52,7 +53,7 @@ class Model:
         }
 
         # Dumping (writing) the file
-        with open(path_name, 'w+', encoding='utf-8') as file:
+        with open(path_name, 'w', encoding='utf-8') as file:
             dump(to_write, file, ensure_ascii=False, indent=4)
     
     # Loads the model variables and updates model variables
@@ -76,16 +77,16 @@ class Model:
         self.model.load_weights(checkpoint_file)
     
     # Creates a callback checkpoint
-    def build_checkpoint(self, epochs:int):
+    def build_checkpoint(self):
         # Fetching current time and logging variables
         current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        path_name = f"network/checkpoint/checkpoint_files{current_time}.ckpt"
+        path_name = f"network/checkpoint/checkpoint_files/{current_time}.ckpt"
         
         # Creating the checkpoint callback
         self.checkpoint_callback = ModelCheckpoint(filepath=path_name,
                                      verbose=2, # Set on logging for testing purposes
                                      save_best_only=True,
-                                     save_freq=epochs,) 
+                                     monitor="accuracy") 
         
     
     # Constructs the layers into the model
@@ -110,7 +111,7 @@ class Model:
 
         self.model.compile(optimizer=self.optimiser,
                            loss=self.loss_function,
-                           metrics=["accuracy",])
+                           metrics="accuracy")
     
     # 
     def train(self, features_train, features_validate, labels_train, labels_validate, epochs):
@@ -120,13 +121,17 @@ class Model:
             y=labels_train,
             validation_data=[features_validate, labels_validate],
             epochs=epochs,
-            callbacks=self.checkpoint_callback
+            callbacks=self.checkpoint_callback,
+            validation_freq=1,
+            use_multiprocessing=True,
+            shuffle=True,
         )
 
         # Returning the history object
         return history
 
     def plot_history(self, history):
+        print(history.history.keys)
         # Plotting down the variabes
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
@@ -136,6 +141,8 @@ class Model:
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
         plt.legend(['train', 'val'], loc='upper left')
+
+        plt.savefig('network/checkpoint/recent_graph', bbox_inches='tight')
 
         # Plotting data
         plt.show()
