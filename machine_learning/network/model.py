@@ -107,13 +107,15 @@ class Model:
 
     # Adding loss function
     def compile_model(self):
+        # Using sparse cross entropy loss function
         self.loss_function = SparseCategoricalCrossentropy()
 
+        # Compiling the model with optimisers, loss and metrics
         self.model.compile(optimizer=self.optimiser,
                            loss=self.loss_function,
                            metrics="accuracy")
     
-    # 
+    # Training the model
     def train(self, features_train, features_validate, labels_train, labels_validate, epochs):
         # Training the model with input data
         history = self.model.fit(

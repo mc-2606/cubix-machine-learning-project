@@ -2,6 +2,7 @@
 from pycuber import Cube, Formula
 from pycuber.solver import CFOPSolver
 from threading import Thread
+from argparse import ArgumentParser
 
 # Using multiprocessing as performance is considerably better
 from multiprocessing import Process
@@ -158,8 +159,15 @@ def create_target_process(amount):
 
 # Main run line
 if __name__ == "__main__":
-    # If I ever need to change the amount of threads
-    process_count = int(input("Process Count: "))
+    # Creating the argument parser
+    arg_parser = ArgumentParser()
+
+    # How many target files
+    arg_parser.add_argument('--process_count', help="determines how many files are generated")
+
+    # Parsing args and getting process count
+    args = arg_parser.parse_args()
+    process_count = int(args.process_count)
 
     # Creating the target processes
     processes = create_target_process(process_count)
@@ -167,3 +175,4 @@ if __name__ == "__main__":
     # Starting each process (i.e each pair of file creation)
     for process in processes:
         process.start()
+

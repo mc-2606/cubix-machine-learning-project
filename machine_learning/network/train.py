@@ -130,7 +130,7 @@ def initial_test_batch(batchsize:int):
               output_neuron_count=OUTPUT_NEURONS_COUNT,
               hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
               output_activation_func=OUTPUT_ACTIVATION_FUNC, 
-              metrics=['accuracy ','val_accuracy'],
+              metrics=['accuracy', 'val_accuracy'],
               learning_rate=0.0003)
     
     # Initialising model
@@ -175,4 +175,5 @@ def further_train_model(batchsize, file_no, date):
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
     model.plot_history(evals)
 
-further_train_model(batchsize=100000, date="20240111-143648", file_no=10)
+initial_test_batch(batchsize=2000)
+#further_train_model(batchsize=100000, date="20240111-143648", file_no=10)
