@@ -30,17 +30,25 @@ def format_file(filename:str, limit=8):
 
     # The new values to be returned
     out_vals = []
+
+    # Current solve count
+    solve_count = 0
    
     # Opening and returning file
     with open(filename, 'r+') as file:
-        for count, line in enumerate(file):
-            if count < limit:
+        # Iterating over file
+        for line in file:
+
+            # Geting right amount of solves
+            if solve_count < limit:
                 # Indication of a new line
                 if str(line) == SOLVED_TOKEN + "\n":
                     pass
                 else:
                     # Adding line to the output
                     out_vals.append(line)
+
+                solve_count += 1
             else:
                 break
     
@@ -113,9 +121,9 @@ def label_encode(target:list):
     return data
 
 # Function for the first initial test (batch)
-def initial_test_batch(batchsize:int):
+def initial_test_batch(training_samples:int):
     # Splitting up data into training and validating batches
-    batch = load_training_data(file_no=1, limit=batchsize)
+    batch = load_training_data(file_no=1, limit=training_samples)
     split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
     
     # Splitting up batch into features and labels
@@ -123,6 +131,10 @@ def initial_test_batch(batchsize:int):
     features_val = split_batch[1]
     labels_train = label_encode(split_batch[2])
     labels_val = label_encode(split_batch[3])
+
+    print(type(features_val))
+    for item in features_val:
+        print(type(item))
 
     # Creating the model
     model = Model(hidden_layer_count=4, 
@@ -136,7 +148,7 @@ def initial_test_batch(batchsize:int):
     # Initialising model
     model.build_model()
     model.build_optimiser()
-    model.build_checkpoint()
+    #model.build_checkpoint()
     model.compile_model()
 
     # Training model + getting results
@@ -144,9 +156,9 @@ def initial_test_batch(batchsize:int):
     model.plot_history(evals)
 
 
-def further_train_model(batchsize, file_no, date):
+def further_train_model(training_samples, file_no, date):
     # Splitting up data into training and validating batches
-    batch = load_training_data(file_no=file_no, limit=batchsize)
+    batch = load_training_data(file_no=file_no, limit=training_samples)
     split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
     
     # Splitting up batch into features and labels
@@ -175,5 +187,5 @@ def further_train_model(batchsize, file_no, date):
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
     model.plot_history(evals)
 
-initial_test_batch(batchsize=2000)
+initial_test_batch(training_samples=64)
 #further_train_model(batchsize=100000, date="20240111-143648", file_no=10)
