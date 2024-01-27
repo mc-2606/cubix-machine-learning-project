@@ -1,10 +1,10 @@
 # Imports
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from model import Model
+from .model import Model
+
 
 # Constants
-DATASET_PATH = "dataset_gen/datasets/"
 FILESIZE = 10000
 EPOCHS = 3
 SOLVED_TOKEN = '$'
@@ -30,9 +30,11 @@ def format_file(filename:str, limit=8):
     # Opening and returning file
     with open(filename, 'r+') as file:
         for count, line in enumerate(file):
+
+            # Only adding required amount
             if count < limit:
-                # Removing the solved token
-                if str(line) == SOLVED_TOKEN:
+                # Not adding the solved token
+                if str(line) == SOLVED_TOKEN + "\n":
                     pass
                 else:
                     out_vals.append(line)
@@ -64,10 +66,10 @@ def format_sols_tolst(data):
     return data
 
 # Loads all of the training data
-def load_training_data(file_no: int):
+def load_training_data(dataset_path:str, file_no: int):
     # Gathers the required file names
-    target_scramble = f"{DATASET_PATH}scramble{file_no}.txt"
-    target_solutions = f"{DATASET_PATH}solutions{file_no}.txt"
+    target_scramble = f"{dataset_path}/scramble{file_no}.txt"
+    target_solutions = f"{dataset_path}/solutions{file_no}.txt"
 
     # Gathering the files
     target_scramble_data = format_file(target_scramble, limit=1000)
@@ -95,28 +97,3 @@ def label_encode(target:list):
 
     return data
 
-test1 = load_training_data(1)
-test2 = split_train_valid(test1[0], test1[1], 0.2, 69)
-
-features_train = test2[0]
-features_val = test2[1]
-labels_train = test2[2]
-labels_val = test2[3]
-
-for item in labels_train:
-    print(type(item))
-
-
-model = Model(hidden_layer_count=4, 
-              layer_sizes=[INPUT_NEURON_COUNT, 1024, 2048, 1024],
-              output_neuron_count=OUTPUT_NEURONS_COUNT,
-              hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
-              output_activation_func=OUTPUT_ACTIVATION_FUNC, 
-              metrics=['val_accuracy'],
-              learning_rate=0.03)
-
-model.build_model()
-model.build_optimiser()
-model.build_checkpoint()
-model.compile_model()
-model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
