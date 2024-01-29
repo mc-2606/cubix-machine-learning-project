@@ -66,7 +66,7 @@ def format_sols_tolst(data):
     return data
 
 # Loads all of the training data
-def load_training_data(dataset_path:str, file_no: int):
+def load_training_data(dataset_path:str, file_no:int):
     # Gathers the required file names
     target_scramble = f"{dataset_path}/scramble{file_no}.txt"
     target_solutions = f"{dataset_path}/solutions{file_no}.txt"
@@ -96,4 +96,3 @@ def label_encode(target:list):
     data = [int(label) for label in encoded_data]
 
     return data
-

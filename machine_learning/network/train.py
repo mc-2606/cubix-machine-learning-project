@@ -1,11 +1,10 @@
 # Imports
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from model import Model
+from .model import Model
 
 
 # Constants
-DATASET_PATH = "dataset_gen/datasets/"
 FILESIZE = 10000
 EPOCHS = 3
 SOLVED_TOKEN = '$'
@@ -43,12 +42,10 @@ def format_file(filename:str, limit=8):
             if solve_count < limit:
                 # Indication of a new line
                 if str(line) == SOLVED_TOKEN + "\n":
-                    pass
+                    solve_count += 1
                 else:
                     # Adding line to the output
                     out_vals.append(line)
-
-                solve_count += 1
             else:
                 break
     
@@ -85,10 +82,10 @@ def format_sols_tolst(data):
 
 
 # Loads all of the training data
-def load_training_data(file_no: int, limit=100):
+def load_training_data(dataset_path:str, file_no:int, limit=100):
     # Gathers the required file names
-    target_scramble = f"{DATASET_PATH}scramble{file_no}.txt"
-    target_solutions = f"{DATASET_PATH}solutions{file_no}.txt"
+    target_scramble = f"{dataset_path}scramble{file_no}.txt"
+    target_solutions = f"{dataset_path}solutions{file_no}.txt"
     
     # Gathering the files
     target_scramble_data = format_file(target_scramble, limit=limit)
@@ -104,7 +101,7 @@ def load_training_data(file_no: int, limit=100):
 # Splits up data into training and valid datasets
 def split_train_valid(features, labels, valid_size, random_state):
     # Using sklearn to split up the data
-    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size, random_state=random_state)
+    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size)
 
     # Returning the training and validation data
     return x_train, x_val, y_train, y_val
@@ -186,6 +183,3 @@ def further_train_model(training_samples, file_no, date):
     # Training model + getting results
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
     model.plot_history(evals)
-
-initial_test_batch(training_samples=64)
-#further_train_model(batchsize=100000, date="20240111-143648", file_no=10)
