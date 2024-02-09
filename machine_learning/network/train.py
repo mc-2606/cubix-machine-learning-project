@@ -5,15 +5,7 @@ from .model import Model
 
 
 # Constants
-FILESIZE = 10000
-EPOCHS = 3
 SOLVED_TOKEN = '$'
-
-# Network Constants
-INPUT_NEURON_COUNT = 54
-HIDDEN_ACTIVATION_FUNC = "relu"
-OUTPUT_ACTIVATION_FUNC = "softmax"
-OUTPUT_NEURONS_COUNT = 19
 
 
 # Label encoding
@@ -37,7 +29,7 @@ def format_file(filename:str, limit=8):
     with open(filename, 'r+') as file:
         # Iterating over file
         for line in file:
-
+            
             # Geting right amount of solves
             if solve_count < limit:
                 # Indication of a new line
@@ -84,8 +76,8 @@ def format_sols_tolst(data):
 # Loads all of the training data
 def load_training_data(dataset_path:str, file_no:int, limit=100):
     # Gathers the required file names
-    target_scramble = f"{dataset_path}scramble{file_no}.txt"
-    target_solutions = f"{dataset_path}solutions{file_no}.txt"
+    target_scramble = f"{dataset_path}/scramble{file_no}.txt"
+    target_solutions = f"{dataset_path}/solutions{file_no}.txt"
     
     # Gathering the files
     target_scramble_data = format_file(target_scramble, limit=limit)
@@ -118,9 +110,9 @@ def label_encode(target:list):
     return data
 
 # Function for the first initial test (batch)
-def initial_test_batch(training_samples:int):
+def initial_test_batch(training_samples:int, dataset_path:str):
     # Splitting up data into training and validating batches
-    batch = load_training_data(file_no=1, limit=training_samples)
+    batch = load_training_data(dataset_path=dataset_path, file_no=1, limit=training_samples)
     split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
     
     # Splitting up batch into features and labels
@@ -129,16 +121,12 @@ def initial_test_batch(training_samples:int):
     labels_train = label_encode(split_batch[2])
     labels_val = label_encode(split_batch[3])
 
-    print(type(features_val))
-    for item in features_val:
-        print(type(item))
-
     # Creating the model
     model = Model(hidden_layer_count=4, 
-              layer_sizes=[INPUT_NEURON_COUNT, 1024, 2048, 1024],
-              output_neuron_count=OUTPUT_NEURONS_COUNT,
-              hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
-              output_activation_func=OUTPUT_ACTIVATION_FUNC, 
+              layer_sizes=[54, 1024, 2048, 1024],
+              output_neuron_count=19,
+              hidden_activation_func='relu',
+              output_activation_func='softmax', 
               metrics=['accuracy', 'val_accuracy'],
               learning_rate=0.0003)
     
@@ -152,8 +140,7 @@ def initial_test_batch(training_samples:int):
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=3)
     model.plot_history(evals)
 
-
-def further_train_model(training_samples, file_no, date):
+def train_model(hidden_layer_count:int, neuron_count:list, output_neuron_count:int, hidden_activation_func:str, output_activation_func:str, epochs:int, training_samples:int, file_no:int, ckpt_path:str, model_load:bool):
     # Splitting up data into training and validating batches
     batch = load_training_data(file_no=file_no, limit=training_samples)
     split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
@@ -165,21 +152,24 @@ def further_train_model(training_samples, file_no, date):
     labels_val = label_encode(split_batch[3])
 
     # Creating the model
-    model = Model(hidden_layer_count=4, 
-              layer_sizes=[INPUT_NEURON_COUNT, 1024, 2048, 1024],
-              output_neuron_count=OUTPUT_NEURONS_COUNT,
-              hidden_activation_func=HIDDEN_ACTIVATION_FUNC,
-              output_activation_func=OUTPUT_ACTIVATION_FUNC, 
+    model = Model(hidden_layer_count=hidden_layer_count, 
+              layer_sizes=neuron_count,
+              output_neuron_count=output_neuron_count,
+              hidden_activation_func=hidden_activation_func,
+              output_activation_func=output_activation_func, 
               metrics=['accuracy', 'val_accuracy'],
               learning_rate=0.0003)
     
     # Initialising model
     model.build_model()
-    #model.load_model(f"network/checkpoints/checkpoint_files/{date}.ckpt")
-    model.load_model(f"network/checkpoint/checkpoint_files/{date}.ckpt")
+    
+    # Loading the model
+    if model_load:
+        model.load_model(f"{ckpt_path}.ckpt")
+    
     model.build_checkpoint()
     model.compile_model()
 
     # Training model + getting results
-    evals = model.train(features_train, features_val, labels_train, labels_val, epochs=EPOCHS)
+    evals = model.train(features_train, features_val, labels_train, labels_val, epochs=epochs)
     model.plot_history(evals)

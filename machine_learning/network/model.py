@@ -117,6 +117,9 @@ class Model:
     
     # Training the model
     def train(self, features_train, features_validate, labels_train, labels_validate, epochs):
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        print(f"[TRAINING - {current_time}] \nEpochs: {epochs}\nLearning Rate: {self.learning_rate}\nMetrics: {self.metrics}\nSGD: {self.optimiser}")
+
         # Training the model with input data
         history = self.model.fit(
             x=features_train,
@@ -133,18 +136,19 @@ class Model:
         return history
 
     def plot_history(self, history):
-        print(history.history.keys)
-        # Plotting down the variabes
+        # Plotting down the variables
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
 
-        # Setting meta data
-        plt.title('model accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
+        # Setting metadata
+        plt.title('Model Accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
         plt.legend(['train', 'val'], loc='upper left')
 
-        plt.savefig('network/checkpoint/recent_graph', bbox_inches='tight')
+        # File naming
+        current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
+        plt.savefig(f'network/checkpoint/{current_time}', bbox_inches='tight')
 
         # Plotting data
         plt.show()
