@@ -11,14 +11,11 @@ from matplotlib import pyplot as plt
 from datetime import datetime
 from json import dump, load
 
-# CONSTANTS
-CHECKPOINT_PATH_TF = "network/checkpoint/checkpoint_files/"
-
 # The Model Handler
 class Model:
 
     # Constructor
-    def __init__(self, hidden_layer_count=None, layer_sizes=None, output_neuron_count=None, hidden_activation_func=None, output_activation_func=None, metrics=None, learning_rate=None):
+    def __init__(self, hidden_layer_count=None, layer_sizes=None, output_neuron_count=None, hidden_activation_func=None, output_activation_func=None, metrics=None, learning_rate=None, checkpoint_path=None,to_save_name=None, load_from_name=None):
         # Network parameters
         self.hidden_layer_count = hidden_layer_count
         self.layer_sizes = layer_sizes
@@ -32,14 +29,18 @@ class Model:
         self.optimiser = None
         self.checkpoint_callback = None
 
+        # Saving Parameters
+        self.checkpoint_path = checkpoint_path
+        self.to_save_name = to_save_name
+        self.load_from_name = load_from_name
+
         # The actual model/network 
         self.model = Sequential()
     
     # Logs the variables in a text file
     def log_model_variables(self):
-        # Fetching current time and logging variables
-        current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        path_name = f"network/checkpoints/{current_time}.json"
+        # Generating path
+        path_name = f"{self.checkpoint_path}/{self.to_save_name}/model_var.json"
 
         # The data needed to be written or saved
         to_write = {
@@ -57,10 +58,10 @@ class Model:
             dump(to_write, file, ensure_ascii=False, indent=4)
     
     # Loads the model variables and updates model variables
-    def load_model_variables(self, model_file):
-
+    def load_model_variables(self):
         # Opening JSON file
-        with open(model_file, 'r+', encoding='utf-8') as file:
+        path = str(f"{self.checkpoint_path}/{self.load_from_name}/model_var.json")
+        with open(path, 'r+', encoding='utf-8') as file:
             consts = load(file)
 
             # Updating network parameters
@@ -73,14 +74,14 @@ class Model:
             self.learning_rate = consts["learning_rate"]
 
     # Loads the targetted checkpoint_file into the model
-    def load_model(self, checkpoint_file):
-        self.model.load_weights(checkpoint_file)
+    def load_model(self):
+        path = str(f"{self.checkpoint_path}/{self.load_from_name}/data_var.ckpt")
+        self.model.load_weights(path)
     
     # Creates a callback checkpoint
     def build_checkpoint(self):
-        # Fetching current time and logging variables
-        current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        path_name = f"network/checkpoint/checkpoint_files/{current_time}.ckpt"
+        # Logging checkpoint
+        path_name = f"{self.checkpoint_path}/{self.to_save_name}/data_var.ckpt"
         
         # Creating the checkpoint callback
         self.checkpoint_callback = ModelCheckpoint(filepath=path_name,
@@ -88,7 +89,6 @@ class Model:
                                      save_best_only=True,
                                      monitor="accuracy") 
         
-    
     # Constructs the layers into the model
     def build_model(self):
         # Adding the required input layers
@@ -103,7 +103,6 @@ class Model:
     # The SGD (calc)
     def build_optimiser(self):
         self.optimiser = Adam(learning_rate=self.learning_rate)
-
 
     # Adding loss function
     def compile_model(self):
@@ -147,8 +146,7 @@ class Model:
         plt.legend(['train', 'val'], loc='upper left')
 
         # File naming
-        current_time = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        plt.savefig(f'network/checkpoint/{current_time}', bbox_inches='tight')
+        plt.savefig(f'{self.checkpoint_path}/{self.to_save_name}/image_var.png', bbox_inches='tight')
 
         # Plotting data
         plt.show()

@@ -109,6 +109,73 @@ def label_encode(target:list):
     # Returning encoded data
     return data
 
+
+def get_batch_split(dataset_path, file_no, training_samples):
+    # Splitting up data into training and validating batches
+    batch = load_training_data(dataset_path=dataset_path, file_no=int(file_no), limit=int(training_samples))
+    split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
+    
+    # Splitting up batch into features and labels
+    features_train = split_batch[0]
+    features_val = split_batch[1]
+    labels_train = label_encode(split_batch[2])
+    labels_val = label_encode(split_batch[3])
+
+    return features_train, features_val, labels_train, labels_val
+
+def create_load_model(checkpoint_path, load_from_name, to_save_name):
+    model = Model(checkpoint_path=checkpoint_path,
+                  load_from_name=load_from_name,
+                  to_save_name=to_save_name)
+
+    return model
+
+def create_new_model(checkpoint_path, hidden_layer_count, layer_sizes, output_neuron_count, hidden_activation_func, output_activation_func, to_save_name, learning_rate):
+
+    model = Model(
+        checkpoint_path=checkpoint_path,
+        layer_sizes=layer_sizes,
+        hidden_layer_count=int(hidden_layer_count),
+        output_neuron_count=int(output_neuron_count),
+        hidden_activation_func=hidden_activation_func,
+        output_activation_func=output_activation_func,
+        to_save_name=to_save_name,
+        learning_rate=float(learning_rate)
+    )
+
+    return model
+
+def setup_new_model(model:Model):
+    model.build_model()
+    model.build_optimiser()
+    model.build_checkpoint()
+    model.compile_model()
+    model.log_model_variables()
+
+def setup_load_model(model:Model):
+    model.load_model_variables()
+    model.build_model()
+    model.load_model()
+
+    model.build_optimiser()
+    model.build_checkpoint()
+    model.compile_model()
+    model.log_model_variables()
+
+
+def train_model(model:Model, features_train, features_val, labels_train, labels_val, epochs):
+    
+    evals = model.train(
+        features_train=features_train,
+        features_validate=features_val,
+        labels_train=labels_train,
+        labels_validate=labels_val,
+        epochs=int(epochs)
+    )
+
+    model.plot_history(evals)
+
+
 # Function for the first initial test (batch)
 def initial_test_batch(training_samples:int, dataset_path:str):
     # Splitting up data into training and validating batches
@@ -140,7 +207,7 @@ def initial_test_batch(training_samples:int, dataset_path:str):
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=3)
     model.plot_history(evals)
 
-def train_model(hidden_layer_count:int, neuron_count:list, output_neuron_count:int, hidden_activation_func:str, output_activation_func:str, epochs:int, training_samples:int, file_no:int, ckpt_path:str, model_load:bool):
+def train_modelSSS(hidden_layer_count:int, neuron_count:list, output_neuron_count:int, hidden_activation_func:str, output_activation_func:str, epochs:int, training_samples:int, file_no:int, ckpt_path:str, model_load:bool):
     # Splitting up data into training and validating batches
     batch = load_training_data(file_no=file_no, limit=training_samples)
     split_batch = split_train_valid(batch[0], batch[1], 0.3, 69)
