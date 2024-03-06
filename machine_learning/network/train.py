@@ -121,17 +121,24 @@ def get_batch_split(dataset_path, file_no, training_samples):
     labels_train = label_encode(split_batch[2])
     labels_val = label_encode(split_batch[3])
 
+    # Returning features + labels
     return features_train, features_val, labels_train, labels_val
 
+
+# Creates a model for loading
 def create_load_model(checkpoint_path, load_from_name, to_save_name):
+
+    # Creating the model
     model = Model(checkpoint_path=checkpoint_path,
                   load_from_name=load_from_name,
                   to_save_name=to_save_name)
 
+    # Returning the model
     return model
 
 def create_new_model(checkpoint_path, hidden_layer_count, layer_sizes, output_neuron_count, hidden_activation_func, output_activation_func, to_save_name, learning_rate):
 
+    # Creating a new model with args
     model = Model(
         checkpoint_path=checkpoint_path,
         layer_sizes=layer_sizes,
@@ -143,20 +150,26 @@ def create_new_model(checkpoint_path, hidden_layer_count, layer_sizes, output_ne
         learning_rate=float(learning_rate)
     )
 
+    # Returning the model
     return model
 
 def setup_new_model(model:Model):
+    # Building training properties for the model
     model.build_model()
     model.build_optimiser()
     model.build_checkpoint()
+
+    # Compiling and saving the model
     model.compile_model()
     model.log_model_variables()
 
 def setup_load_model(model:Model):
+    # Loading + Building model
     model.load_model_variables()
     model.build_model()
     model.load_model()
 
+    # Compiling and saving the model
     model.build_optimiser()
     model.build_checkpoint()
     model.compile_model()
@@ -164,7 +177,8 @@ def setup_load_model(model:Model):
 
 
 def train_model(model:Model, features_train, features_val, labels_train, labels_val, epochs):
-    
+
+    # Training the model
     evals = model.train(
         features_train=features_train,
         features_validate=features_val,
@@ -173,6 +187,7 @@ def train_model(model:Model, features_train, features_val, labels_train, labels_
         epochs=int(epochs)
     )
 
+    # Plotting the model
     model.plot_history(evals)
 
 

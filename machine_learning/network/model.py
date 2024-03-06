@@ -59,8 +59,10 @@ class Model:
     
     # Loads the model variables and updates model variables
     def load_model_variables(self):
-        # Opening JSON file
+        # Creaeting string JSON file
         path = str(f"{self.checkpoint_path}/{self.load_from_name}/model_var.json")
+
+        # Opening JSON file
         with open(path, 'r+', encoding='utf-8') as file:
             consts = load(file)
 

@@ -108,6 +108,7 @@ if __name__ == '__main__':
             layer_sizes = (args.lsizes).split(',')
             layer_sizes = [int(layer_size) for layer_size in layer_sizes]
 
+            # Creating a new model
             model = create_new_model(
                 checkpoint_path=DEFAULT_CHECKPOINTS_DIR,
                 hidden_layer_count=hidden_layer_count,
@@ -119,6 +120,7 @@ if __name__ == '__main__':
                 learning_rate=learning_rate
                 )
 
+            # Setting up the new model
             setup_new_model(model)
         
         else:
@@ -129,6 +131,7 @@ if __name__ == '__main__':
                 to_save_name=save_name
                 )
             
+            # Settings up the loaded model
             setup_load_model(model)
         
         # Training the model
