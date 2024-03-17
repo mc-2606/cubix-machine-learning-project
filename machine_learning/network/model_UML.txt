@@ -1,0 +1,37 @@
+@startuml
+class Model {
+    log_model_variables()
+    load_model_variables()
+    load_model()
+    build_checkpoint()
+    build_model()
+    build_optimiser()
+    compile_model()
+    train()
+    plot_history()
+        hidden_layer_count
+    layer_sizes
+    output_neuron_count
+    hidden_activation_func
+    output_activation_func
+    metrics
+    learning_rate
+    optimiser
+    checkpoint_callback
+    checkpoint_path
+    to_save_name
+    load_from_name
+    model
+    hidden_layer_count
+    layer_sizes
+    output_neuron_count
+    hidden_activation_func
+    output_activation_func
+    metrics
+    learning_rate
+    checkpoint_callback
+    optimiser
+    loss_function
+    __init__()
+}
+@enduml

@@ -159,7 +159,10 @@ def create_target_process(amount):
 
 # Main run line
 if __name__ == "__main__":
-    # Creating the argument parser
+    
+
+
+    '''# Creating the argument parser
     arg_parser = ArgumentParser()
 
     # How many target files
@@ -174,5 +177,5 @@ if __name__ == "__main__":
 
     # Starting each process (i.e each pair of file creation)
     for process in processes:
-        process.start()
+        process.start()'''
 

@@ -110,6 +110,7 @@ def label_encode(target:list):
     return data
 
 
+# Splits up the data into features and labels for training and validating
 def get_batch_split(dataset_path, file_no, training_samples):
     # Splitting up data into training and validating batches
     batch = load_training_data(dataset_path=dataset_path, file_no=int(file_no), limit=int(training_samples))
@@ -136,6 +137,7 @@ def create_load_model(checkpoint_path, load_from_name, to_save_name):
     # Returning the model
     return model
 
+# Creates a new model from scratch
 def create_new_model(checkpoint_path, hidden_layer_count, layer_sizes, output_neuron_count, hidden_activation_func, output_activation_func, to_save_name, learning_rate):
 
     # Creating a new model with args
@@ -153,6 +155,7 @@ def create_new_model(checkpoint_path, hidden_layer_count, layer_sizes, output_ne
     # Returning the model
     return model
 
+# Function to handle a new model
 def setup_new_model(model:Model):
     # Building training properties for the model
     model.build_model()
@@ -163,12 +166,13 @@ def setup_new_model(model:Model):
     model.compile_model()
     model.log_model_variables()
 
+# Function to handle model when loading
 def setup_load_model(model:Model):
     # Loading + Building model
     model.load_model_variables()
     model.build_model()
     model.load_model()
-
+    
     # Compiling and saving the model
     model.build_optimiser()
     model.build_checkpoint()
@@ -255,3 +259,9 @@ def train_modelSSS(hidden_layer_count:int, neuron_count:list, output_neuron_coun
     # Training model + getting results
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=epochs)
     model.plot_history(evals)
+
+
+
+features, labels = load_training_data("C:\project\project\machine_learning\dataset_gen\datasets/", 1, limit=5)
+split_data = split_train_valid(features, labels, 0.2, 1)
+

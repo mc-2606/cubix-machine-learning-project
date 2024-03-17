@@ -59,7 +59,7 @@ class Model:
     
     # Loads the model variables and updates model variables
     def load_model_variables(self):
-        # Creaeting string JSON file
+        # Creating string JSON file
         path = str(f"{self.checkpoint_path}/{self.load_from_name}/model_var.json")
 
         # Opening JSON file
@@ -136,6 +136,7 @@ class Model:
         # Returning the history object
         return history
 
+    # Plos the history
     def plot_history(self, history):
         # Plotting down the variables
         plt.plot(history.history['accuracy'])
@@ -152,4 +153,5 @@ class Model:
 
         # Plotting data
         plt.show()
+
 

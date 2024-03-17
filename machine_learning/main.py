@@ -35,25 +35,20 @@ arg_parser.add_argument('-ls', '--lsizes', help="defines the neuron count/size o
 arg_parser.add_argument('-hlc', '--hlayercount', help="defines the amount of hidden + input layers")
 
 # May help when seeing what files to load etc.
-arg_parser.add_argument('-lc', '--lchecks', help="lists all checkpoints", default=0)
-arg_parser.add_argument('-lir', '--lres', help="lists all image results", default=0)
-arg_parser.add_argument('-lm', '-lmodel', help="lists all model variables", default=0)
+arg_parser.add_argument('-sh', '--showsaves', help="lists all the saves/checkpoints", default=0)
 
+
+# Main run line
 if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     # Lists out the checkpoints files
-    if int(args.lchecks):
-        for file in listdir(DEFAULT_CHECKPOINTS_DIR):
-            print(file)
-        exit(0)
-    
-    # Lists the checkpoint files
-    if int(args.lres):
-        for file in listdir(DEFAULT_RESULTS_DIR):
-            if file == "checkpoint_files":
-                pass
-            print(file)
+    if int(args.showsaves):
+        # Iterating over directories
+        for save in listdir(DEFAULT_CHECKPOINTS_DIR):
+            # Printing the name of directory
+            print(f"[-] {save}")
+        
         exit(0)
     
     # Runs a training test sample
@@ -121,7 +116,7 @@ if __name__ == '__main__':
                 )
 
             # Setting up the new model
-            setup_new_model(model)
+            # setup_new_model(model)
         
         else:
             # Loads the model
@@ -132,7 +127,7 @@ if __name__ == '__main__':
                 )
             
             # Settings up the loaded model
-            setup_load_model(model)
+            # setup_load_model(model)
         
         # Training the model
         train_model(model=model,
