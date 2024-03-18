@@ -48,11 +48,21 @@ class Model:
         # Adding the output layer
         output_layer = Dense(units=(self.output_neuron_count), activation=self.output_activation_func, name="layer_output")
         self.model.add(output_layer)
+    
+    # The SGD (calc)
+    def build_optimiser(self):
+        self.optimiser = Adam(learning_rate=self.learning_rate)
+    
+    # Adding loss function
+    def compile_model(self):
+        self.model.compile(optimizer=self.optimiser,
+                           loss=self.loss_function,
+                           metrics=self.metrics)
 
 
 # Creating new model    
 model = Model(2, [1, 1], 19, 'relu', 'softmax')
 model.build_model()
-track_layers = model.model.layers
-len(track_layers)
+model.build_optimiser()
+model.compile_model
 

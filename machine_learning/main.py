@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 )
 
             # Setting up the new model
-            # setup_new_model(model)
+            setup_new_model(model)
         
         else:
             # Loads the model
