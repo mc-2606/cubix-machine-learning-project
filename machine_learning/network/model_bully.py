@@ -55,14 +55,44 @@ class Model:
     
     # Adding loss function
     def compile_model(self):
+        # Using sparse cross entropy loss function
+        self.loss_function = SparseCategoricalCrossentropy()
+
+        # Compiling the model with optimisers, loss and metrics
         self.model.compile(optimizer=self.optimiser,
                            loss=self.loss_function,
-                           metrics=self.metrics)
+                           metrics="accuracy")
+    
+    # Trainig the model
+    def train(self, features_train, features_validate, labels_train, labels_validate, epochs):
+        history = self.model.fit(
+            x=features_train,
+            y=labels_train,
+            validation_data=[features_validate, labels_validate],
+            epochs=epochs,
+        )
+
+        print(history.history['accuracy'])
 
 
 # Creating new model    
 model = Model(2, [1, 1], 19, 'relu', 'softmax')
 model.build_model()
-model.build_optimiser()
-model.compile_model
 
+# Setting learning rate
+model.learning_rate = 0.01
+model.metrics = ["accuracy"]
+
+# Building and compiling
+model.build_optimiser()
+model.compile_model()
+
+# Generating a set of training data
+train_x = [i for i in range(0, 5)]
+train_y = [i for i in range(0, 5)]
+validate_x = [i for i in range(0, 2)]
+validate_y = [i for i in range(0, 2)]
+
+# Training model
+model.train(train_x, validate_x, train_y, validate_y, 2)
+model

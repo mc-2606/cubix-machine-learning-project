@@ -129,6 +129,7 @@ def generate_file(filenumber):
     write_to_file(scramble_file, NEW_TOKEN)
     write_to_file(solutions_file, NEW_TOKEN)
 
+generate_file(1)
 
 # Used to create the dataset (thread function)
 def generate_dataset(fileNumber):
@@ -136,7 +137,7 @@ def generate_dataset(fileNumber):
     print(f"[{datetime.datetime.now()}] Generating dataset ~ Dataset No:{fileNumber}")
 
     # Creating a set amount of solutions through the SOLUTIONS_NUMBER constant
-    for count in range(SOLUTIONS_NUMBER):
+    for _ in range(SOLUTIONS_NUMBER):
         generate_file(fileNumber)
 
     # End time
@@ -160,7 +161,7 @@ def create_target_process(amount):
 # Main run line
 if __name__ == "__main__":
     
-
+    pass
 
     '''# Creating the argument parser
     arg_parser = ArgumentParser()
