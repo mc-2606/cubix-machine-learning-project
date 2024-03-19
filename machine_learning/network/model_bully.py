@@ -96,3 +96,4 @@ validate_y = [i for i in range(0, 2)]
 # Training model
 model.train(train_x, validate_x, train_y, validate_y, 2)
 model
+

@@ -87,7 +87,9 @@ def gen_random_solve():
     # Solving the cube
     solver = CFOPSolver(temp_cube)
     solutions = list(solver.solve())
-    solutions = [str(i) for i in solutions]
+    solutions = [i for i in solutions]
+
+    solutions, cube
 
     # Returning the solutions and the cube
     return solutions, cube
@@ -129,8 +131,6 @@ def generate_file(filenumber):
     write_to_file(scramble_file, NEW_TOKEN)
     write_to_file(solutions_file, NEW_TOKEN)
 
-generate_file(1)
-
 # Used to create the dataset (thread function)
 def generate_dataset(fileNumber):
     # Start time - has no purpose apart from supplying me with info
@@ -156,7 +156,9 @@ def create_target_process(amount):
     
     # Returning the process
     return processes
-            
+
+
+gen_random_solve()
 
 # Main run line
 if __name__ == "__main__":
