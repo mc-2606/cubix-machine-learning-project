@@ -127,7 +127,7 @@ if __name__ == '__main__':
                 )
             
             # Settings up the loaded model
-            # setup_load_model(model)
+            setup_load_model(model)
         
         # Training the model
         train_model(model=model,
