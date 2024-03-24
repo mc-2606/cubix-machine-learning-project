@@ -21,6 +21,28 @@ NUM_VALS = {
     "yellow": 5
 }
 
+# Returning the cube into an ordered state (in the same orer as NUM_VALS)
+def order_colour_cube(cube:Cube):
+    # The cube represented as an array
+    ordered_colour_cube = []
+
+    # Going through colour
+    for colour in NUM_VALS.keys():
+        # Fetching the current colour
+        colour_code = cube.which_face(colour)
+        colour_vals = cube.get_face(colour_code)
+
+        # Fetching the square colours
+        for item in colour_vals:
+            for piece in item:
+                # Adding the colour of the square to the cube array
+                ordered_colour_cube.append(piece.colour)
+    
+    # Returning the cube array
+    return ordered_colour_cube
+
+cube = Cube()
+
 
 # Converts the cube to number format (easier for model format)
 def convert_colour_to_nums(cube:list):
@@ -34,25 +56,6 @@ def convert_colour_to_nums(cube:list):
     # Returning the numbered cube
     return nums_cube
 
-# Returning the cube into an ordered state (in the same orer as NUM_VALS)
-def order_colour_cube(cube:Cube):
-    # The cube represented as an array
-    ordered_colour_cube = []
-
-    #
-    for colour in NUM_VALS.keys():
-        # Fetching the current colour
-        colour_code = cube.which_face(colour)
-        colour_vals = cube.get_face(colour_code)
-
-        # Fetching the square colours
-        for side in colour_vals:
-            for square in side:
-                # Adding the colour of the sqaure to the cube array
-                ordered_colour_cube.append(square.colour)
-    
-    # Returning the cube array
-    return ordered_colour_cube
 
 # Constructing the cube into a text format for writing
 def construct_valid_cube(cube:Cube):
