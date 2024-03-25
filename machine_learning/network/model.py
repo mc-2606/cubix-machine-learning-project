@@ -24,6 +24,7 @@ class Model:
         self.output_activation_func = output_activation_func
 
         # Training variables
+        self.loss_function = None
         self.metrics = metrics
         self.learning_rate = learning_rate
         self.optimiser = None
@@ -75,7 +76,7 @@ class Model:
             self.metrics = consts["metrics"]
             self.learning_rate = consts["learning_rate"]
 
-    # Loads the targetted checkpoint_file into the model
+    # Loads the targeted checkpoint_file into the model
     def load_model(self):
         path = str(f"{self.checkpoint_path}/{self.load_from_name}/data_var.ckpt")
         self.model.load_weights(path)
