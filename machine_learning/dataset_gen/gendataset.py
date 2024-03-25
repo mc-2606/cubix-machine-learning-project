@@ -41,20 +41,18 @@ def order_colour_cube(cube:Cube):
     # Returning the cube array
     return ordered_colour_cube
 
-cube = Cube()
 
-
-# Converts the cube to number format (easier for model format)
+# Converting the colours to numbers
 def convert_colour_to_nums(cube:list):
-    # Converting the cube array to just letters
-    nums_cube = [i[0] for i in cube]
-
+       # Iterating over the cube
     for count, colour in enumerate(cube):
         # Replacing each letter with corresponding number
-        nums_cube[count] = NUM_VALS[colour]
+        cube[count] = NUM_VALS[colour]
     
     # Returning the numbered cube
-    return nums_cube
+    return cube
+
+
 
 
 # Constructing the cube into a text format for writing
@@ -82,20 +80,20 @@ def gen_random_solve():
     # Creating the cube and applying the formula/scramble
     cube = Cube()
     cube(random_alg)
-
-    # Temporary cube (i.e scramble is lost on this cube) 
-    temp_cube = Cube()
-    temp_cube(random_alg)
     
     # Solving the cube
-    solver = CFOPSolver(temp_cube)
+    solver = CFOPSolver(cube)
     solutions = list(solver.solve())
     solutions = [i for i in solutions]
 
-    solutions, cube
-
     # Returning the solutions and the cube
     return solutions, cube
+
+solutions, cube = gen_random_solve()
+
+cube = construct_valid_cube(cube)
+
+solutions, cube
 
 # Universal function to write to a text file 
 def write_to_file(path, values, newline=True):
@@ -160,8 +158,6 @@ def create_target_process(amount):
     # Returning the process
     return processes
 
-
-gen_random_solve()
 
 # Main run line
 if __name__ == "__main__":
