@@ -11,7 +11,7 @@ import datetime
 # Important constants
 SOLVED_TOKEN = "S"
 NEW_TOKEN = "$"
-SOLUTIONS_NUMBER = 10000
+SOLUTIONS_NUMBER = 10
 NUM_VALS = {
     "white": 0,
     "red": 1,
@@ -53,11 +53,9 @@ def convert_colour_to_nums(cube:list):
     return cube
 
 
-
-
 # Constructing the cube into a text format for writing
 def construct_valid_cube(cube:Cube):
-    # Converting the cube
+    # Converting the cube to an ordered numbered cube
     coloured_cube = order_colour_cube(cube)
     numbered_cube = convert_colour_to_nums(coloured_cube)
 
@@ -80,24 +78,22 @@ def gen_random_solve():
     # Creating the cube and applying the formula/scramble
     cube = Cube()
     cube(random_alg)
-    
+
+    # Temporary cube (i.e scramble is lost on this cube)
+    temp_cube = Cube()
+    temp_cube(random_alg)
+
     # Solving the cube
-    solver = CFOPSolver(cube)
+    solver = CFOPSolver(temp_cube)
     solutions = list(solver.solve())
-    solutions = [i for i in solutions]
+    solutions = [str(i) for i in solutions]
 
     # Returning the solutions and the cube
     return solutions, cube
 
-solutions, cube = gen_random_solve()
-
-cube = construct_valid_cube(cube)
-
-solutions, cube
-
 # Universal function to write to a text file 
 def write_to_file(path, values, newline=True):
-    # Opening the path to files
+    # Opening theS path to files
     with open(path, "a+") as file:
         # Writing new values
         file.write(values)
@@ -133,19 +129,20 @@ def generate_file(filenumber):
     write_to_file(solutions_file, NEW_TOKEN)
 
 # Used to create the dataset (thread function)
-def generate_dataset(fileNumber):
+def generate_dataset(file_number):
     # Start time - has no purpose apart from supplying me with info
-    print(f"[{datetime.datetime.now()}] Generating dataset ~ Dataset No:{fileNumber}")
+    print(f"[{datetime.datetime.now()}] Generating dataset ~ Dataset No:{file_number}")
 
     # Creating a set amount of solutions through the SOLUTIONS_NUMBER constant
     for _ in range(SOLUTIONS_NUMBER):
-        generate_file(fileNumber)
+        generate_file(file_number)
 
     # End time
-    print(f"[{datetime.datetime.now()}] DATASET GENERATED ~ Dataset No:{fileNumber}")  
+    print(f"[{datetime.datetime.now()}] DATASET GENERATED ~ Dataset No:{file_number}")  
+
 
 # Creates the amount of targeted threads/processes
-def create_target_process(amount):
+def create_target_thread(amount):
     # List of threads/processes
     processes = []
 
@@ -161,23 +158,30 @@ def create_target_process(amount):
 
 # Main run line
 if __name__ == "__main__":
-    
-    pass
-
-    '''# Creating the argument parser
-    arg_parser = ArgumentParser()
-
-    # How many target files
-    arg_parser.add_argument('--process_count', help="determines how many files are generated")
-
-    # Parsing args and getting process count
-    args = arg_parser.parse_args()
-    process_count = int(args.process_count)
+    # If I ever need to change the amount of threads
+    thread_count = 10
 
     # Creating the target processes
-    processes = create_target_process(process_count)
+    threads = create_target_thread(thread_count)
 
     # Starting each process (i.e each pair of file creation)
-    for process in processes:
-        process.start()'''
+    for thread in threads:
+        thread.start()
+
+    # # Creating the argument parser
+    # arg_parser = ArgumentParser()
+
+    # # How many target files
+    # arg_parser.add_argument('--process_count', help="determines how many files are generated")
+
+    # # Parsing args and getting process count
+    # args = arg_parser.parse_args()
+    # process_count = int(args.process_count)
+
+    # # Creating the target processes
+    # processes = create_target_process(process_count)
+
+    # # Starting each process (i.e each pair of file creation)
+    # for process in processes:
+    #     process.start()
 
