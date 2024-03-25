@@ -21,38 +21,39 @@ NUM_VALS = {
     "yellow": 5
 }
 
-
-# Converts the cube to number format (easier for model format)
-def convert_colour_to_nums(cube:list):
-    # Converting the cube array to just letters
-    nums_cube = [i[0] for i in cube]
-
-    for count, colour in enumerate(cube):
-        # Replacing each letter with corresponding number
-        nums_cube[count] = NUM_VALS[colour]
-    
-    # Returning the numbered cube
-    return nums_cube
-
 # Returning the cube into an ordered state (in the same orer as NUM_VALS)
 def order_colour_cube(cube:Cube):
     # The cube represented as an array
     ordered_colour_cube = []
 
-    #
+    # Going through colour
     for colour in NUM_VALS.keys():
         # Fetching the current colour
         colour_code = cube.which_face(colour)
         colour_vals = cube.get_face(colour_code)
 
         # Fetching the square colours
-        for side in colour_vals:
-            for square in side:
-                # Adding the colour of the sqaure to the cube array
-                ordered_colour_cube.append(square.colour)
+        for item in colour_vals:
+            for piece in item:
+                # Adding the colour of the square to the cube array
+                ordered_colour_cube.append(piece.colour)
     
     # Returning the cube array
     return ordered_colour_cube
+
+
+# Converting the colours to numbers
+def convert_colour_to_nums(cube:list):
+       # Iterating over the cube
+    for count, colour in enumerate(cube):
+        # Replacing each letter with corresponding number
+        cube[count] = NUM_VALS[colour]
+    
+    # Returning the numbered cube
+    return cube
+
+
+
 
 # Constructing the cube into a text format for writing
 def construct_valid_cube(cube:Cube):
@@ -79,20 +80,20 @@ def gen_random_solve():
     # Creating the cube and applying the formula/scramble
     cube = Cube()
     cube(random_alg)
-
-    # Temporary cube (i.e scramble is lost on this cube) 
-    temp_cube = Cube()
-    temp_cube(random_alg)
     
     # Solving the cube
-    solver = CFOPSolver(temp_cube)
+    solver = CFOPSolver(cube)
     solutions = list(solver.solve())
     solutions = [i for i in solutions]
 
-    solutions, cube
-
     # Returning the solutions and the cube
     return solutions, cube
+
+solutions, cube = gen_random_solve()
+
+cube = construct_valid_cube(cube)
+
+solutions, cube
 
 # Universal function to write to a text file 
 def write_to_file(path, values, newline=True):
@@ -157,8 +158,6 @@ def create_target_process(amount):
     # Returning the process
     return processes
 
-
-gen_random_solve()
 
 # Main run line
 if __name__ == "__main__":
