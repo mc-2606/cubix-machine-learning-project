@@ -12,7 +12,7 @@ from datetime import datetime
 from json import dump, load
 
 # CONSTANTS
-CHECKPOINT_PATH_TF = "network/checkpoint/checkpoint_files/"
+CHECKPOINT_PATH_TF = "checkpoint/checkpoint_files/"
 
 
 # The Model Handler
@@ -100,7 +100,7 @@ model.build_model()
 
 # Setting learning rate
 model.learning_rate = 0.01
-model.metrics = ["accuracy", "val_accuracy"]
+model.metrics = ["accuracy"]
 
 # Building and compiling
 model.build_optimiser()
