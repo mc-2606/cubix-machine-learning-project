@@ -42,12 +42,6 @@ def format_file(filename:str, limit=8):
     # Returning the list
     return out_vals 
 
-
-# scramble = format_file("D:/A_LEVEL_PROJECT/project/machine_learning/dataset_gen/datasets/scramble1.txt")
-# solution = format_file("D:/A_LEVEL_PROJECT/project/machine_learning/dataset_gen/datasets/solutions1.txt")
-
-# scramble, solution
-
 # Splits up stringed items in to nested list
 def format_scram_tolst(data):
     for index, state in enumerate(data):
@@ -77,6 +71,7 @@ def format_sols_tolst(data):
     return data
 
 
+
 # Loads all of the training data
 def load_training_data(dataset_path:str, file_no:int, limit=100):
     # Gathers the required file names
@@ -93,6 +88,18 @@ def load_training_data(dataset_path:str, file_no:int, limit=100):
     
     # Returning correctly formatted data
     return format_scramble_data, format_solutions_data
+
+scramble_form, solution_form = load_training_data("D:/A_LEVEL_PROJECT/project/machine_learning/dataset_gen/datasets", 1, 8)
+
+# # Getting the lists
+# scramble = format_file("D:/A_LEVEL_PROJECT/project/machine_learning/dataset_gen/datasets/scramble1.txt")
+# solution = format_file("D:/A_LEVEL_PROJECT/project/machine_learning/dataset_gen/datasets/solutions1.txt")
+
+# # Removing new lines from list
+# scramble_form = format_scram_tolst(scramble)
+# solution_form = format_sols_tolst(solution)
+
+# scramble, solution, scramble_form, solution_form
 
 # # Splits up data into training and valid datasets
 # def split_train_valid(features, labels, valid_size, random_state):
