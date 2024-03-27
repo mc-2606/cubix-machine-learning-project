@@ -132,7 +132,7 @@ class Model:
             validation_freq=1,
             use_multiprocessing=True,
             shuffle=True,
-        )
+        ).expect_partial()
 
         # Returning the history object
         return history
