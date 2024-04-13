@@ -1,23 +1,26 @@
 # Module imports imports
-from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
 from PyQt6.QtWidgets import QLabel, QWidget, QVBoxLayout, QPushButton, QMessageBox
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QPixmap, QImage
 
 # Importing other important modules
-from packages.modules.scan import convertimage_qt, generate_grid_positions
+from packages.modules.scan import convertimage_qt, generate_grid_positions, get_colours_from_grids
 
 
 # Thread handler
 class ImageThread(QThread):
+
+    # Live Signal updates
     image_update = pyqtSignal(QImage)
+    colour_update = pyqtSignal(list)
 
     # On thread.start()
     def run(self):
         self.thread_active = True
 
         # Capturing video + metadata
-        capture = VideoCapture(0)
+        capture = VideoCapture(0, CAP_DSHOW)
         width = capture.get(CAP_PROP_FRAME_WIDTH)
         height = capture.get(CAP_PROP_FRAME_HEIGHT)
 
@@ -28,10 +31,17 @@ class ImageThread(QThread):
             if ret:
                 # Image prep
                 grid_positions = generate_grid_positions(width, height)
-                converted_image = convertimage_qt(frame, grid_positions)
+
+                # Fetching the colours
+                colours = get_colours_from_grids(frame, grid_positions)
+
+                converted_image = convertimage_qt(frame, grid_positions)  
 
                 # Emitting the image
                 self.image_update.emit(converted_image)
+                
+                # Emitting the colours at grid positions
+                self.colour_update.emit(colours)
 
             # If no camera present
             else:
@@ -58,6 +68,9 @@ class ScanWindow(QWidget):
             "Yellow"
         ]
 
+        self.cube_side_colours = []
+        self.current_grid_colours = []
+
         # Setting out main widgets
         self.layout = QVBoxLayout()
         self.view_finder = QLabel()
@@ -77,6 +90,11 @@ class ScanWindow(QWidget):
         self.permission_prompt = QLabel()
         self.permission_prompt.setText("Request permission to use camera")
 
+        # Scan button
+        self.scan_button = QPushButton()
+        self.scan_button.setText("Scan Side")
+        self.scan_button.clicked.connect(self.scan)
+
         # Which side to currently scan + scanned sides
         self.current_scan = 0
         self.current_side = QLabel()
@@ -88,21 +106,28 @@ class ScanWindow(QWidget):
         
         # The image thread -> outputs are fed into the view_finder
         self.image_thread = ImageThread()
+
+        # 
+        self.image_thread.colour_update.connect(self.process_grid_colours)
     
     # Updates the scanned sides
     def increment_scan(self):
         # Whilst the scans are less than 6 (comparing the index)
-        if self.current_scan < 5:
-            # Incrementing scan
-            self.current_scan += 1
-
+        if self.current_scan < 6:
             # Updating variables
-            side = "Scan: " + self.SCAN_ORDER[self.current_scan]
-            self.scanned += (", " + side)
+            side = self.SCAN_ORDER[self.current_scan]
+            self.scanned += (side + ", ")
 
             # Updating widget text
-            self.current_side.setText(side)
-            self.scanned_sides.setText(self.scanned) 
+            if self.current_scan == 5:
+                self.current_side.setText("Scan Completed")
+            else:
+                self.current_side.setText(f"Scan: {self.SCAN_ORDER[self.current_scan+1]}")
+                
+            self.scanned_sides.setText(self.scanned)
+
+            # Incrementing scan
+            self.current_scan += 1
     
     # Feeds the image to view_finder to be displayed
     def update_fiewfinder(self, image):
@@ -137,6 +162,7 @@ class ScanWindow(QWidget):
         self.layout.addWidget(self.current_side)
         self.layout.addWidget(self.scanned_sides)
         self.layout.addWidget(self.view_finder)
+        self.layout.addWidget(self.scan_button)
     
     # When permission to use camera allowed
     def allow_camera_permission(self):
@@ -153,3 +179,12 @@ class ScanWindow(QWidget):
         message.setInformativeText("You need to use a camera for this application!")
 
         message.exec()
+
+    # Updates the class colour state
+    def process_grid_colours(self, grid_colours):
+        self.current_grid_colours = grid_colours
+        print(self.current_grid_colours)
+    
+    # When a butotn is scanned
+    def scan(self):
+        self.increment_scan()
