@@ -46,9 +46,10 @@ def format_file(filename:str, limit=8):
 
 # Splits up stringed items in to nested list
 def format_scram_tolst(data):
+
     for index, state in enumerate(data):
         # Removing the the newline operator from data
-        state = state[:-3]
+        state = state[:-2]
 
         # Splitting up the data into
         state = state.split()
@@ -179,7 +180,6 @@ def setup_load_model(model:Model):
     model.compile_model()
     model.log_model_variables()
 
-
 def train_model(model:Model, features_train, features_val, labels_train, labels_val, epochs):
 
     # Training the model
@@ -208,12 +208,11 @@ def initial_test_batch(training_samples:int, dataset_path:str):
     labels_val = label_encode(split_batch[3])
 
     # Creating the model
-    model = Model(hidden_layer_count=4, 
-              layer_sizes=[54, 1024, 2048, 1024],
+    model = Model(hidden_layer_count=3, 
+              layer_sizes=[1024, 2048, 1024],
               output_neuron_count=19,
               hidden_activation_func='relu',
-              output_activation_func='softmax', 
-              metrics=['accuracy', 'val_accuracy'],
+              output_activation_func='softmax',
               learning_rate=0.0003)
     
     # Initialising model

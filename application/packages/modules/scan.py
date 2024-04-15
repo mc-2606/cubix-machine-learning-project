@@ -1,20 +1,62 @@
 # Module imports
-from numpy import array, uint8
-from cv2 import cvtColor, COLOR_BGR2RGB, COLOR_BGR2HSV, flip, inRange, rectangle
+from numpy import uint8
+from cv2 import cvtColor, COLOR_BGR2RGB, COLOR_BGR2HSV, flip, rectangle
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QImage
 
-COLOUR_RANGES = {
-    'white': {'lower': array([0, 0, 180]), 'upper': array([30, 30, 255])},  # Hue: 0-30, Saturation: 0-30, Value: 180-255
-    'red': {'lower': array([0, 100, 100]), 'upper': array([10, 255, 255])},  # Hue: 0-10, Saturation: 100-255, Value: 100-255
-    'green': {'lower': array([40, 100, 100]), 'upper': array([80, 255, 255])},  # Hue: 40-80, Saturation: 100-255, Value: 100-255
-    'orange': {'lower': array([10, 100, 100]), 'upper': array([25, 255, 255])},  # Hue: 10-25, Saturation: 100-255, Value: 100-255
-    'blue': {'lower': array([100, 100, 100]), 'upper': array([130, 255, 255])},  # Hue: 100-130, Saturation: 100-255, Value: 100-255
-    'yellow': {'lower': array([20, 100, 100]), 'upper': array([40, 255, 255])}  # Hue: 20-40, Saturation: 100-255, Value: 100-255
+# Display RGB vals
+COLOUR_TO_RGB = {
+    'red'    : (255, 0, 0),
+    'orange' : (255, 165, 0),
+    'blue'   : (0, 0, 255),
+    'green'  : (0, 255, 0),
+    'white'  : (255, 255, 255),
+    'yellow' : (255, 255, 0) 
 }
 
+# Corresponding sides for scanning
+CORRESPONDING_SIDES = {
+    'white': {
+        'top': 'green',
+        'bottom': 'blue',
+        'left': 'red',
+        'right': 'orange'
+    },
+    'red': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'blue',
+        'right': 'green'
+    },
+    'green': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'red',
+        'right': 'orange'
+    },
+    'orange': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'green',
+        'right': 'blue'
+    },
+    'blue': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'orange',
+        'right': 'red'
+    },
+    'yellow': {
+        'top': 'blue',
+        'bottom': 'green',
+        'left': 'red',
+        'right': 'orange'
+    }
+}
+
+
 # How far apart grid spaces should be
-GRID_SPACING = 160
+GRID_SPACING = 120
 RECT_WIDTH = 10
 RECT_COLOUR = (255, 255, 255)
 
@@ -90,47 +132,41 @@ def get_colours_from_grids(frame, grid_positions):
         hsv_frame = cvtColor(uint8([[frame_colour]]), COLOR_BGR2HSV)
         hsv_colour = hsv_frame[0][0]
 
-        hsv_colour = array([int(i) for i in hsv_colour])
-
-        # Classifiying the colour and adding to the list
-        classified_colour = color_detect(hsv_colour[0], hsv_colour[1], hsv_colour[2])        
+        # Classifying the colour and adding to the list
+        classified_colour = classify_colour(hsv_colour)        
         classified_colours.append(classified_colour)
 
     # Returning the classified colour
     return classified_colours
 
-def color_detect(h,s,v):
-    # print(h,s,v)
-    if h < 5 and s>5 :
-        return 'red'
-    elif h <10 and h>=3:
-        return 'orange'
-    elif h <= 25 and h>10:
-        return 'yellow'
-    elif h>=70 and h<= 85 and s>100 and v<180:
-        return 'green'
-    elif h <= 130 and s>70:
-        return 'blue'
-    elif h <= 100 and s<10 and v<200:
-        return 'white'
-
-    return 'white'
-
 # Classifies the colour within a range
 def classify_colour(hsv_colour):
-    # Iterating over the specified ranges
-    for colour, ranges in COLOUR_RANGES.items():
-        # Getting bounds for ranges
-        lower_bound = ranges['lower']
-        upper_bound = ranges['upper']
+    # Splitting up hsv colour into hue, saturation and value
+    hue = hsv_colour[0]
+    sat = hsv_colour[1]
+    val = hsv_colour[2]
 
-        # inRange returns boolean - if the colour falls in the range
-        in_range = inRange(hsv_colour, lower_bound, upper_bound)
+    # Making the colour comparisons
+    if (0 <= hue < 5 or 170 <= hue <= 180) and sat > 100 and val > 100:
+        return 'red'
+    elif 5 <= hue < 20 and sat > 100 and val > 100:
+        return 'orange'
+    elif 30 <= hue < 50 and sat > 100 and val > 100:
+        return 'yellow'
+    elif 50 <= hue < 90 and sat > 100 and val > 100:
+        return 'green'
+    elif 90 <= hue < 140 and sat > 100 and val > 100:
+        return 'blue'
+    else:
+        return 'white'
 
-        # If it is in range, return colour
-        if in_range.any():
-            return colour
-    
-    # If colour is not valid
-    return None
+# Returns the RGB value for a colour (on a Rubik's cube)
+def conv_colour_to_RGB(target_colour):
+
+    # Iterating over the colours
+    for colour in COLOUR_TO_RGB.keys():
+
+        # If colours match, returns the RGB value for that colour
+        if target_colour == colour:
+            return COLOUR_TO_RGB[colour]
 
