@@ -46,9 +46,10 @@ def format_file(filename:str, limit=8):
 
 # Splits up stringed items in to nested list
 def format_scram_tolst(data):
+
     for index, state in enumerate(data):
         # Removing the the newline operator from data
-        state = state[:-3]
+        state = state[:-2]
 
         # Splitting up the data into
         state = state.split()
@@ -93,7 +94,7 @@ def load_training_data(dataset_path:str, file_no:int, limit=100):
 # Splits up data into training and valid datasets
 def split_train_valid(features, labels, valid_size, random_state):
     # Using sklearn to split up the data
-    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size)
+    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size, random_state=random_state)
 
     # Returning the training and validation data
     return x_train, x_val, y_train, y_val
@@ -178,7 +179,6 @@ def setup_load_model(model:Model):
     model.build_checkpoint()
     model.compile_model()
     model.log_model_variables()
-
 
 def train_model(model:Model, features_train, features_val, labels_train, labels_val, epochs):
 

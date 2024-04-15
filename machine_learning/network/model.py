@@ -94,6 +94,9 @@ class Model:
         
     # Constructs the layers into the model
     def build_model(self):
+        layer = Dense(units=54, activation=self.hidden_activation_func, name="input", input_shape=(54,))
+        self.model.add(layer)
+
         # Adding the required input layers
         for count in range(self.hidden_layer_count):
             layer = Dense(units=(self.layer_sizes[count]), activation=self.hidden_activation_func, name=f"layer_{count}")
@@ -132,7 +135,10 @@ class Model:
             validation_freq=1,
             use_multiprocessing=True,
             shuffle=True,
-        ).expect_partial()
+        )
+
+        for layer in self.model.layers:
+            print(layer.units)
 
         # Returning the history object
         return history
@@ -154,5 +160,11 @@ class Model:
 
         # Plotting data
         plt.show()
+    
+    # Predicts the next best move with an array
+    def predict(self, cube_input):
+        prediction = self.model.predict(cube_input)
+
+        return prediction
 
 
