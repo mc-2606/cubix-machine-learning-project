@@ -79,7 +79,7 @@ class Model:
     # Loads the targeted checkpoint_file into the model
     def load_model(self):
         path = str(f"{self.checkpoint_path}/{self.load_from_name}/data_var.ckpt")
-        self.model.load_weights(path)
+        self.model.load_weights(path).expect_partial()
     
     # Creates a callback checkpoint
     def build_checkpoint(self):

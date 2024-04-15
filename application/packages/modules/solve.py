@@ -1,7 +1,8 @@
-from pycuber import Cube, array_to_cubies, solver
+from pycuber import Cube, array_to_cubies, solver, Formula
 from keras.models import load_model
 from os import getcwd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
 
 NUM_VALS = {
@@ -26,8 +27,10 @@ LABELS = ["F", "R", "U", "L", "B", "D", "F'", "R'", "U'", "L'", "B'", "D'", "F2"
 
 
 MODEL_LOCATION = f"{getcwd()}/packages/modules/"
-MODEL_SAVE_NAME = "test_run"
+MODEL_SAVE_NAME = "model_cat_8"
 
+label_encoder = LabelEncoder()
+label_encoder.fit(LABELS)
 
 # Converting the colours to numbers
 def conv_colour_to_nums(cube:list):
@@ -156,32 +159,63 @@ def solve_cube(input_array):
     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
 
     count = 0
+    
+    temp_cube = set_cube(pyc_flatten_array)
 
     # Using pycuber to generate the actual solve
-    cfop_solver = solver.CFOPSolver(py_cube)
+    cfop_solver = solver.CFOPSolver(temp_cube)
     solve = [str(i) for i in cfop_solver.solve()]
 
-    print(solve)
-
-    print(py_cube)
 
     while True:
         model_predict_array = prepare_predict_array(py_cube)
-
+        
         predicted_num = np.argmax(model.predict([model_predict_array]), axis=1)[0]
-        predicted_move = LABELS[predicted_num]
+        print(predicted_num)
 
-        if predicted_move == "S":
-            if py_cube == Cube():
-                print("cube is actually solved")
-                break
+        test = label_encoder.inverse_transform([predicted_num])
+        # predicted_move = LABELS[predicted_num]
 
-            print("false solve")
-        else:
-            py_cube(predicted_move)
-            print(py_cube, predicted_move)
+        print(test)
+
+        # if predicted_move == "S":
+        #     if py_cube == Cube():
+        #         print("cube is actually solved")
+        #         break
+
+        #     print("false solve")
+        # else:
+        #     py_cube(predicted_move)
+        #     print(py_cube, predicted_move)
             
 
-        count += 1
+        # count += 1
         input()
 
+# cube = Cube()
+# alg = Formula()
+# slg = alg.random()
+
+# temp_cube = Cube()
+# cube(slg)
+# temp_cube(slg)
+
+# # Using pycuber to generate the actual solve
+# cfop_solver = solver.CFOPSolver(temp_cube)
+# solve = [str(i) for i in cfop_solver.solve()]
+
+
+
+# while True:
+#     model_array = prepare_predict_array(cube)
+
+#     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
+
+#     predicted_num = np.argmax(model.predict([model_array]), axis=1)[0]
+#     move = label_encoder.inverse_transform([predicted_num])
+
+#     print(move)
+#     print(solve)
+#     print(cube)
+#     cube(move)
+#     input()

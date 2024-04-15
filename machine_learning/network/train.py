@@ -103,12 +103,16 @@ def split_train_valid(features, labels, valid_size, random_state):
 def label_encode(target:list):
     # Transforming and replacing the order 
     encoded_data = label_encoder.transform(target)
+
+    print(encoded_data)
     
     # Converting each item (previously numpy.int32) to python integer
     data = [int(label) for label in encoded_data]
 
     # Returning encoded data
     return data
+
+print(label_encode(["F", "R", "U", "L", "B", "D", "F'", "R'", "U'", "L'", "B'", "D'", "F2", "R2", "U2", "L2", "B2", "D2", "S"]))
 
 
 # Splits up the data into features and labels for training and validating
