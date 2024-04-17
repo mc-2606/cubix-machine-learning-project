@@ -27,13 +27,14 @@ LABELS = ["F", "R", "U", "L", "B", "D", "F'", "R'", "U'", "L'", "B'", "D'", "F2"
 
 
 MODEL_LOCATION = f"{getcwd()}/packages/modules/"
-MODEL_SAVE_NAME = "model_cat_8"
+MODEL_SAVE_NAME = "model_cat_10"
 
 label_encoder = LabelEncoder()
 label_encoder.fit(LABELS)
 
 # Converting the colours to numbers
 def conv_colour_to_nums(cube:list):
+    # Output cube
     out_cube = []
 
     # Iterating over the cube
@@ -43,6 +44,8 @@ def conv_colour_to_nums(cube:list):
             out_cube.append(NUM_VALS[colour])
 
             count += 1
+    
+    # Returning the numbered cube
     return out_cube
 
 # Converting the colours to numbers
@@ -109,20 +112,26 @@ def order_colour_cube(cube:Cube):
     # Returning the cube array
     return ordered_colour_cube
 
+
+# Flattens the list into a formattable string
 def flatten(input_list):
+    # Output string
     output = ""
 
+    # Adding the value to the string
     for item in input_list:
         output += str(item)
     
+    # Returning the output
     return output
 
-
+# Creating the cube
 def set_cube(cubie_form:list):
-    print(cubie_form)
+    # Creating the cube
     cubies = array_to_cubies(cubie_form)
     cube = Cube(cubies)
     
+    # Returning the cube
     return cube
 
 def process_input_array(input_list):
@@ -132,12 +141,18 @@ def process_input_array(input_list):
     # Divide each sublist into nested lists of size 3
     nested_lists = [np.array([sublist[i:i+3] for i in range(0, len(sublist), 3)]) for sublist in sublists]
 
-
+    # Restructuring the input data
     for count, sublist in enumerate(nested_lists):
+        # Transposing the face and converting it to list
         nested_lists[count] = sublist.T.tolist()
 
-    flat_list = [item for sublist in nested_lists for nested_list in sublist for item in nested_list]
+        # Mirroring the face as the scan was mirrored
+        nested_lists[count] = [row[::-1] for row in nested_lists[count]]
 
+    # Merging back sublists into 1 list
+    flat_list = [item for sublist in nested_lists for nested_list in sublist for item in nested_list]
+    
+    # Returning the flat list
     return flat_list
 
 # Solves the cube
@@ -151,46 +166,100 @@ def solve_cube(input_array):
     # Applying temporary
     pyc_cube_array = conv_colour_to_nums_pyc(pyc_array)
     pyc_flatten_array = flatten(pyc_cube_array)
-
-    # Generating the pycuber cube
-    py_cube = set_cube(pyc_flatten_array)
-
+    
     # Loading the model
     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
-
-    count = 0
     
-    temp_cube = set_cube(pyc_flatten_array)
+    # Generating the appropriate cubes
+    original_state = set_cube(pyc_flatten_array) # Original cube scramble state
+    model_predict_cube = set_cube(pyc_flatten_array) # Cube for model prediction
+    to_solve_cube = set_cube(pyc_flatten_array) # Cube for generating pycuber cube
+    verify_cube = set_cube(pyc_flatten_array) # Cube for verifying the predictions are valid
 
     # Using pycuber to generate the actual solve
-    cfop_solver = solver.CFOPSolver(temp_cube)
-    solve = [str(i) for i in cfop_solver.solve()]
+    cfop_solver = solver.CFOPSolver(to_solve_cube)
+    pycuber_solutions = [str(move) for move in cfop_solver.solve()]
+
+    # To keep track of predictions
+    predicted_solutions = []
+    prediction_index = 0
+
+    # Any matching solutions to backtrack to incase of a loop
+    matching_solutions = []
+    previous_matching = True
+    previous_matching_index = 0
 
 
     while True:
-        model_predict_array = prepare_predict_array(py_cube)
+        # Generating the array for model prediction
+        model_predict_array = prepare_predict_array(model_predict_cube)
         
+        # Getting the predicted move
         predicted_num = np.argmax(model.predict([model_predict_array]), axis=1)[0]
-        print(predicted_num)
+        predicted_move = str(label_encoder.inverse_transform([predicted_num])[0])
 
-        test = label_encoder.inverse_transform([predicted_num])
-        # predicted_move = LABELS[predicted_num]
+        # Adding the solutions to the predicted move
+        predicted_solutions.append(predicted_move)
 
-        print(test)
+        if predicted_move == "S":
+            formula = Formula(predicted_solutions)
 
-        # if predicted_move == "S":
-        #     if py_cube == Cube():
-        #         print("cube is actually solved")
-        #         break
+            if verify_cube(formula) == Cube():
+                print("cube is actually solved")
+                print(len(predicted_solutions))
+                
+                break
+                # return predicted_solutions
+        
+        print(previous_matching_index, len(pycuber_solutions))
+        # If matching so far with the generated solutions # THIS WORKS
+        if previous_matching and previous_matching_index < len(pycuber_solutions):
+            # If predicted move matches the generated solution
+            if pycuber_solutions[prediction_index] == predicted_move:
+                
+                # Add the solution to the matching solutions
+                matching_solutions.append(pycuber_solutions[previous_matching_index])
+                previous_matching_index += 1
+            else:
+                previous_matching = False
+        
+        # Backtracking
+        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0:
+            # Reverting to last previously correct state
+            predicted_solutions = predicted_solutions[0:previous_matching_index]
+            prediction_index = previous_matching_index
 
-        #     print("false solve")
-        # else:
-        #     py_cube(predicted_move)
-        #     print(py_cube, predicted_move)
-            
+            # Applying the next correct move
+            next_correct_move = pycuber_solutions[previous_matching_index]
 
-        # count += 1
-        input()
+            model_predict_cube(next_correct_move)
+            predicted_solutions.append(next_correct_move)
+            matching_solutions.append(next_correct_move)
+
+            prediction_index += 1
+            previous_matching_index += 1
+
+            previous_matching = True
+        else:
+            model_predict_cube(predicted_move)
+            prediction_index += 1
+        
+        # print(pycuber_solutions)
+        # print(matching_solutions, previous_matching_index, matching_solutions[previous_matching_index-1])
+        # print(predicted_solutions, prediction_index, predicted_solutions[prediction_index-1])
+
+    print(pycuber_solutions)
+    print(matching_solutions)
+    print(predicted_solutions)
+
+    
+
+        
+
+        
+
+        
+
 
 # cube = Cube()
 # alg = Formula()
@@ -219,3 +288,11 @@ def solve_cube(input_array):
 #     print(cube)
 #     cube(move)
 #     input()
+
+# [b][w][w]
+# [b][w][w]
+# [b][w][w]
+
+# [w][w][b]
+# [w][w][b]
+# [w][w][b]

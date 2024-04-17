@@ -271,6 +271,7 @@ class ScanWindow(QWidget):
                     self.image_thread.stop()
 
                     # Lets main program know that the scanning process has been finished
+                    print(self.cube_side_colours)
                     self.scan_compelted.emit(self.cube_side_colours)
                     self.hide()
                 

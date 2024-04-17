@@ -26,5 +26,6 @@ test = array_to_cubies("000000000000000000222222222333333444333444444555555555")
 """
 
 # Generating cube and formula
-cube = Cube(test)
+cube = Cube()
+cube('F2')
 print(cube)
