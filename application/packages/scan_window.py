@@ -155,7 +155,7 @@ class FaceWidget(QWidget):
 # The scan window
 class ScanWindow(QWidget):
     # When the scan is completed
-    scan_compelted = pyqtSignal(list)
+    scan_completed = pyqtSignal(list)
 
     # OOP inheritance from QWidget
     def __init__(self):
@@ -238,7 +238,6 @@ class ScanWindow(QWidget):
         # The colours are correct
         return True
 
-
     # Updates the scanned sides
     def increment_scan(self):
         # Whilst the scans are less than 6 (comparing the index)
@@ -267,13 +266,9 @@ class ScanWindow(QWidget):
                 
                 # Verifying if solve is valid
                 if self.verify_valid_scan():
-                    # Stops the image thread for performance
-                    self.image_thread.stop()
-
                     # Lets main program know that the scanning process has been finished
-                    print(self.cube_side_colours)
-                    self.scan_compelted.emit(self.cube_side_colours)
-                    self.hide()
+                    self.scan_completed.emit(self.cube_side_colours)
+                    self.start_new_scan()
                 
                 # If the solve is not valid
                 else:

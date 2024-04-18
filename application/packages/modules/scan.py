@@ -119,7 +119,6 @@ def convertimage_qt(frame, grid_positions):
     # Returning converted image
     return qt_image
 
-
 # Gets the colours of each grid position
 def get_colours_from_grids(frame, grid_positions):
     # The classified colours

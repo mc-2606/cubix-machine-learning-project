@@ -134,6 +134,7 @@ def set_cube(cubie_form:list):
     # Returning the cube
     return cube
 
+# Prepares input data for pycuber format
 def process_input_array(input_list):
     # Divide the input list into sublists of size 9
     sublists = [input_list[i:i+9] for i in range(0, len(input_list), 9)]
@@ -155,6 +156,16 @@ def process_input_array(input_list):
     # Returning the flat list
     return flat_list
 
+# Verifying solve
+def verify_solve(solutions, cube):
+    formula = Formula(solutions[:-1])
+
+    # Checking if cube is predicted correctly
+    if cube(formula) == Cube():
+        return True
+    return False
+
+
 # Solves the cube
 def solve_cube(input_array):
     # Converting array to cubie format
@@ -171,7 +182,6 @@ def solve_cube(input_array):
     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
     
     # Generating the appropriate cubes
-    original_state = set_cube(pyc_flatten_array) # Original cube scramble state
     model_predict_cube = set_cube(pyc_flatten_array) # Cube for model prediction
     to_solve_cube = set_cube(pyc_flatten_array) # Cube for generating pycuber cube
     verify_cube = set_cube(pyc_flatten_array) # Cube for verifying the predictions are valid
@@ -190,6 +200,7 @@ def solve_cube(input_array):
     previous_matching_index = 0
 
 
+    # Iteratively solving the cube
     while True:
         # Generating the array for model prediction
         model_predict_array = prepare_predict_array(model_predict_cube)
@@ -200,20 +211,17 @@ def solve_cube(input_array):
 
         # Adding the solutions to the predicted move
         predicted_solutions.append(predicted_move)
+        print(predicted_move)
 
-        if predicted_move == "S":
-            formula = Formula(predicted_solutions)
-
-            if verify_cube(formula) == Cube():
-                print("cube is actually solved")
-                print(len(predicted_solutions))
-                
-                break
-                # return predicted_solutions
-        
-        print(previous_matching_index, len(pycuber_solutions))
-        # If matching so far with the generated solutions # THIS WORKS
-        if previous_matching and previous_matching_index < len(pycuber_solutions):
+        # If the move predicted has been solved
+        if predicted_move == "S" and verify_solve(predicted_solutions, verify_cube):
+            return predicted_solutions
+        else:
+            # Reverting verify cube to original state
+            verify_cube = set_cube(pyc_flatten_array)
+       
+        # If matching so far with the generated solutions 
+        if previous_matching:
             # If predicted move matches the generated solution
             if pycuber_solutions[prediction_index] == predicted_move:
                 
@@ -229,29 +237,31 @@ def solve_cube(input_array):
             predicted_solutions = predicted_solutions[0:previous_matching_index]
             prediction_index = previous_matching_index
 
-            # Applying the next correct move
+            # Fetching the next predicted move
             next_correct_move = pycuber_solutions[previous_matching_index]
 
+            # Appying the next correct move to the cubes
             model_predict_cube(next_correct_move)
             predicted_solutions.append(next_correct_move)
             matching_solutions.append(next_correct_move)
 
+            # Updating indexes and now the predictinos should match the solutions up to a point
             prediction_index += 1
             previous_matching_index += 1
-
             previous_matching = True
+
+            # In some cases, the model will not predict the correct last move - we are checking if the backtracking move is the last move.
+            if len(pycuber_solutions) == previous_matching_index and verify_solve(predicted_solutions, verify_cube):
+                return predicted_solutions
+            else:
+                # Reverting verify cube to original state
+                verify_cube = set_cube(pyc_flatten_array)
+
+            
         else:
+            # If a different move, then just applying the move
             model_predict_cube(predicted_move)
             prediction_index += 1
-        
-        # print(pycuber_solutions)
-        # print(matching_solutions, previous_matching_index, matching_solutions[previous_matching_index-1])
-        # print(predicted_solutions, prediction_index, predicted_solutions[prediction_index-1])
-
-    print(pycuber_solutions)
-    print(matching_solutions)
-    print(predicted_solutions)
-
     
 
         
