@@ -1,10 +1,11 @@
+# Module improts
+import numpy as np
 from pycuber import Cube, array_to_cubies, solver, Formula
 from keras.models import load_model
 from os import getcwd
-import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-
+# Model prediction values
 NUM_VALS = {
     "white": 0,
     "red": 1,
@@ -14,6 +15,7 @@ NUM_VALS = {
     "yellow": 5
 }
 
+# Representing cube with pycuber values
 PYC_NUM_VALS = {
     "red": 0,
     "yellow": 1,
@@ -25,10 +27,11 @@ PYC_NUM_VALS = {
 
 LABELS = ["F", "R", "U", "L", "B", "D", "F'", "R'", "U'", "L'", "B'", "D'", "F2", "R2", "U2", "L2", "B2", "D2", "S"]
 
-
+# The mdoel save location and the model name
 MODEL_LOCATION = f"{getcwd()}/packages/modules/"
 MODEL_SAVE_NAME = "model_cat_10"
 
+# Creating a label encode for decoding predicted values
 label_encoder = LabelEncoder()
 label_encoder.fit(LABELS)
 

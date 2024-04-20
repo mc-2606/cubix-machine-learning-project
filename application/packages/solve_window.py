@@ -1,7 +1,6 @@
 # Module imports
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
 from PyQt6.QtCore import pyqtSignal, Qt
-from packages.modules.solve import solve_cube
 
 
 # Creating the solve window

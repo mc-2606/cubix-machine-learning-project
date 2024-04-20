@@ -23,7 +23,8 @@ class ImageThread(QThread):
         capture = VideoCapture(0, CAP_DSHOW)
         width = capture.get(CAP_PROP_FRAME_WIDTH)
         height = capture.get(CAP_PROP_FRAME_HEIGHT)
-
+        
+        # Running code
         while self.thread_active:
             ret, frame = capture.read()
 
