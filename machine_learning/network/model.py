@@ -137,9 +137,6 @@ class Model:
             shuffle=True,
         )
 
-        for layer in self.model.layers:
-            print(layer.units)
-
         # Returning the history object
         return history
 

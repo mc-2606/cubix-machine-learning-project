@@ -142,7 +142,7 @@ def generate_dataset(file_number):
 
 
 # Creates the amount of targeted threads/processes
-def create_target_thread(amount):
+def create_target_process(amount):
     # List of threads/processes
     processes = []
 
@@ -159,14 +159,14 @@ def create_target_thread(amount):
 # Main run line
 if __name__ == "__main__":
     # If I ever need to change the amount of threads
-    thread_count = 10
+    process_count = 10
 
     # Creating the target processes
-    threads = create_target_thread(thread_count)
+    processes = create_target_process(process_count)
 
     # Starting each process (i.e each pair of file creation)
-    for thread in threads:
-        thread.start()
+    for process in processes:
+        process.start()
 
     # # Creating the argument parser
     # arg_parser = ArgumentParser()

@@ -19,38 +19,38 @@ CORRESPONDING_SIDES = {
     'white': {
         'top': 'green',
         'bottom': 'blue',
-        'left': 'red',
-        'right': 'orange'
+        'left': 'orange',
+        'right': 'red'
     },
     'red': {
-        'top': 'yellow',
-        'bottom': 'white',
-        'left': 'blue',
-        'right': 'green'
-    },
-    'green': {
-        'top': 'yellow',
-        'bottom': 'white',
-        'left': 'red',
-        'right': 'orange'
-    },
-    'orange': {
         'top': 'yellow',
         'bottom': 'white',
         'left': 'green',
         'right': 'blue'
     },
-    'blue': {
+    'green': {
         'top': 'yellow',
         'bottom': 'white',
         'left': 'orange',
         'right': 'red'
     },
+    'orange': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'blue',
+        'right': 'green'
+    },
+    'blue': {
+        'top': 'yellow',
+        'bottom': 'white',
+        'left': 'red',
+        'right': 'orange'
+    },
     'yellow': {
         'top': 'blue',
         'bottom': 'green',
-        'left': 'red',
-        'right': 'orange'
+        'left': 'orange',
+        'right': 'red'
     }
 }
 

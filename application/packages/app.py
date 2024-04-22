@@ -1,9 +1,9 @@
-
 # Module imports
 import sys
 from PyQt6.QtWidgets import QApplication
 from packages.scan_window import ScanWindow
 from packages.solve_window import SolveWindow
+from packages.user_guide import UserGuideWindow
 from packages.modules.solve import solve_cube
 from threading import Thread
 
@@ -13,6 +13,16 @@ app = QApplication([])
 # The scan and solve windows
 scan_window = ScanWindow()
 solve_window = SolveWindow()
+user_guide_window = UserGuideWindow()
+
+# Starts the initial scan process
+def start_initial_scan_session():
+    # Hiding the user guide window
+    user_guide_window.hide()
+
+    # Starting the application
+    scan_window.application_startup()
+    scan_window.show()
 
 # Starts the scanning process
 def start_scan_session():
@@ -40,7 +50,7 @@ def start_solve_session(scramble):
 def solve_cube_async(scramble, scan_window):
     # Predicting next moves
     predicted_moves = solve_cube(scramble)
-    
+   
     # Solutions text
     solutions_text = "Solutions: "
 
@@ -48,7 +58,7 @@ def solve_cube_async(scramble, scan_window):
     for move in predicted_moves:
         solutions_text += str(move)
         solutions_text += " "
-    
+   
     # Updating the solutions label
     solve_window.solutions_label.setText(solutions_text)
 
@@ -56,13 +66,14 @@ def solve_cube_async(scramble, scan_window):
 # Setting up function links
 scan_window.scan_completed.connect(start_solve_session)
 solve_window.new_solve.connect(start_scan_session)
+user_guide_window.proceed_scan.connect(start_initial_scan_session)
 
 
 # Main run window
 def main():
-    # Starting the application
-    scan_window.application_startup()
-    scan_window.show()
+    # Starting the user guide
+    user_guide_window.application_startup()
+    user_guide_window.show()
 
     # Executing application
     sys.exit(app.exec())
@@ -116,7 +127,7 @@ def main():
 # sw = start_solve(['yellow', 'orange', 'green', 'white', 'white', 'orange', 'blue', 'blue', 'green', 'orange', 'green', 'orange', 'orange', 'red', 'red', 'white', 'white', 'yellow', 'yellow', 'yellow', 'red', 'green', 'green', 'green', 'white', 'red', 'yellow', 'white', 'blue', 'orange', 'yellow', 'orange', 'blue', 'green', 'red', 'blue', 'blue', 'red', 'red', 'white', 'blue', 'white', 'green', 'yellow', 'white', 'red', 'orange', 'orange', 'blue', 'yellow', 'yellow', 'red', 'green', 'blue'])
 
 # # Execute the application
-# app.exec()
+# app = QApplication([])
 
 
 

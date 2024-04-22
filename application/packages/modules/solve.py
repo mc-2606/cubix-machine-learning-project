@@ -36,6 +36,21 @@ label_encoder = LabelEncoder()
 label_encoder.fit(LABELS)
 
 # Converting the colours to numbers
+def conv_colour_to_nums_pyc(cube:list):
+    out_cube = []
+
+    # Iterating over the cube
+    for count, colour in enumerate(cube):
+        # Replacing each letter with corresponding number
+        if count < 54:
+            out_cube.append(PYC_NUM_VALS[colour])
+
+            count += 1
+    
+    # Returning the numbered cube
+    return out_cube
+
+# Converting the colours to numbers
 def conv_colour_to_nums(cube:list):
     # Output cube
     out_cube = []
@@ -45,21 +60,6 @@ def conv_colour_to_nums(cube:list):
         # Replacing each letter with corresponding number
         if count < 54:
             out_cube.append(NUM_VALS[colour])
-
-            count += 1
-    
-    # Returning the numbered cube
-    return out_cube
-
-# Converting the colours to numbers
-def conv_colour_to_nums_pyc(cube:list):
-    out_cube = []
-
-    # Iterating over the cube
-    for count, colour in enumerate(cube):
-        # Replacing each letter with corresponding number
-        if count < 54:
-            out_cube.append(PYC_NUM_VALS[colour])
 
             count += 1
     
@@ -92,28 +92,8 @@ def prepare_predict_array(cube:Cube):
     coloured_cube = order_colour_cube(cube)
     numbered_cube = conv_colour_to_nums(coloured_cube)
 
+    # Returning the model predict array
     return numbered_cube
-
-
-# Returning the cube into an ordered state (in the same orer as NUM_VALS)
-def order_colour_cube(cube:Cube):
-    # The cube represented as an array
-    ordered_colour_cube = []
-
-    # Going through colour
-    for colour in NUM_VALS.keys():
-        # Fetching the current colour
-        colour_code = cube.which_face(colour)
-        colour_vals = cube.get_face(colour_code)
-
-        # Fetching the square colours
-        for item in colour_vals:
-            for piece in item:
-                # Adding the colour of the square to the cube array
-                ordered_colour_cube.append(piece.colour)
-    
-    # Returning the cube array
-    return ordered_colour_cube
 
 
 # Flattens the list into a formattable string
@@ -161,6 +141,7 @@ def process_input_array(input_list):
 
 # Verifying solve
 def verify_solve(solutions, cube):
+    # Generating the formula
     formula = Formula(solutions[:-1])
 
     # Checking if cube is predicted correctly
@@ -177,17 +158,19 @@ def solve_cube(input_array):
     # Swapping order for cubies
     pyc_array[0:9], pyc_array[9:18], pyc_array[18:27], pyc_array[27:36], pyc_array[36:45], pyc_array[45:54] = pyc_array[9:18], pyc_array[45:54], pyc_array[18:27], pyc_array[0:9], pyc_array[27:36], pyc_array[36:45]
 
-    # Applying temporary
+    # Converting the data
     pyc_cube_array = conv_colour_to_nums_pyc(pyc_array)
-    pyc_flatten_array = flatten(pyc_cube_array)
+    pyc_cubie_form = flatten(pyc_cube_array)
+
+    pyc_cubie_form
     
     # Loading the model
     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
     
     # Generating the appropriate cubes
-    model_predict_cube = set_cube(pyc_flatten_array) # Cube for model prediction
-    to_solve_cube = set_cube(pyc_flatten_array) # Cube for generating pycuber cube
-    verify_cube = set_cube(pyc_flatten_array) # Cube for verifying the predictions are valid
+    model_predict_cube = set_cube(pyc_cubie_form) # Cube for model prediction
+    to_solve_cube = set_cube(pyc_cubie_form) # Cube for generating pycuber cube
+    verify_cube = set_cube(pyc_cubie_form) # Cube for verifying the predictions are valid
 
     # Using pycuber to generate the actual solve
     cfop_solver = solver.CFOPSolver(to_solve_cube)
@@ -214,14 +197,13 @@ def solve_cube(input_array):
 
         # Adding the solutions to the predicted move
         predicted_solutions.append(predicted_move)
-        print(predicted_move)
 
         # If the move predicted has been solved
         if predicted_move == "S" and verify_solve(predicted_solutions, verify_cube):
             return predicted_solutions
         else:
             # Reverting verify cube to original state
-            verify_cube = set_cube(pyc_flatten_array)
+            verify_cube = set_cube(pyc_cubie_form)
        
         # If matching so far with the generated solutions 
         if previous_matching:
@@ -231,11 +213,13 @@ def solve_cube(input_array):
                 # Add the solution to the matching solutions
                 matching_solutions.append(pycuber_solutions[previous_matching_index])
                 previous_matching_index += 1
+            
+            # If the predicted move does not match the generated solution
             else:
                 previous_matching = False
         
-        # Backtracking
-        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0:
+        # Backtracking (in infinite loops)
+        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0 or prediction_index > 100:
             # Reverting to last previously correct state
             predicted_solutions = predicted_solutions[0:previous_matching_index]
             prediction_index = previous_matching_index
@@ -248,64 +232,27 @@ def solve_cube(input_array):
             predicted_solutions.append(next_correct_move)
             matching_solutions.append(next_correct_move)
 
-            # Updating indexes and now the predictinos should match the solutions up to a point
+            # Updating indexes and now the predictions should match the solutions up to a point
             prediction_index += 1
             previous_matching_index += 1
             previous_matching = True
 
             # In some cases, the model will not predict the correct last move - we are checking if the backtracking move is the last move.
-            if len(pycuber_solutions) == previous_matching_index and verify_solve(predicted_solutions, verify_cube):
-                return predicted_solutions
-            else:
-                # Reverting verify cube to original state
-                verify_cube = set_cube(pyc_flatten_array)
+            if len(pycuber_solutions) == previous_matching_index:
+                # Adding solve token for checking
+                predicted_solutions.append("S")
 
-            
+                # If verifying the cube
+                if verify_solve(predicted_solutions, verify_cube):
+                    return predicted_solutions
+                
+                # Removing the solve token if not solved
+                predicted_solutions.pop()
+                
+            # Reverting verify cube to original state
+            verify_cube = set_cube(pyc_cubie_form)
+
         else:
             # If a different move, then just applying the move
             model_predict_cube(predicted_move)
             prediction_index += 1
-    
-
-        
-
-        
-
-        
-
-
-# cube = Cube()
-# alg = Formula()
-# slg = alg.random()
-
-# temp_cube = Cube()
-# cube(slg)
-# temp_cube(slg)
-
-# # Using pycuber to generate the actual solve
-# cfop_solver = solver.CFOPSolver(temp_cube)
-# solve = [str(i) for i in cfop_solver.solve()]
-
-
-
-# while True:
-#     model_array = prepare_predict_array(cube)
-
-#     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
-
-#     predicted_num = np.argmax(model.predict([model_array]), axis=1)[0]
-#     move = label_encoder.inverse_transform([predicted_num])
-
-#     print(move)
-#     print(solve)
-#     print(cube)
-#     cube(move)
-#     input()
-
-# [b][w][w]
-# [b][w][w]
-# [b][w][w]
-
-# [w][w][b]
-# [w][w][b]
-# [w][w][b]

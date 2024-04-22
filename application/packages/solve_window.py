@@ -1,7 +1,14 @@
 # Module imports
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
 from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QPixmap
+from os import getcwd
 
+
+# Getting image paths
+PATH = getcwd()
+
+CUBE_NOTATION_PATH = f"{PATH}/packages/modules/images/cube_notation.png"
 
 # Creating the solve window
 class SolveWindow(QWidget):
@@ -23,6 +30,11 @@ class SolveWindow(QWidget):
         self.new_solve_button = QPushButton()
         self.new_solve_button.setText("New Solve")
         self.new_solve_button.clicked.connect(self.start_new_solve)
+
+        # Cube Notation Image
+        self.cube_notation_image = QLabel()
+        self.cube_notation_image.setPixmap(QPixmap(CUBE_NOTATION_PATH).scaledToWidth(450))
+        self.cube_notation_image.setStyleSheet("border: 2px solid black;")
         
         self.setFixedWidth(500)
     
@@ -37,6 +49,9 @@ class SolveWindow(QWidget):
         self.layout.addWidget(self.solutions_label)
         self.layout.addWidget(self.new_solve_button)
 
+        # Adding the cube notation image
+        self.layout.addWidget(self.cube_notation_image)
+
     # Sets up the solve window
     def application_startup(self):
         # Adding all of the widgets
@@ -45,4 +60,3 @@ class SolveWindow(QWidget):
         # Setting the title
         self.setLayout(self.layout)
         self.setWindowTitle("Solve")
-    
