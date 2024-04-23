@@ -109,7 +109,7 @@ def flatten(input_list):
     return output
 
 # Creating the cube
-def set_cube(cubie_form:list):
+def set_cube(cubie_form):
     # Creating the cube
     cubies = array_to_cubies(cubie_form)
     cube = Cube(cubies)
@@ -161,8 +161,6 @@ def solve_cube(input_array):
     # Converting the data
     pyc_cube_array = conv_colour_to_nums_pyc(pyc_array)
     pyc_cubie_form = flatten(pyc_cube_array)
-
-    pyc_cubie_form
     
     # Loading the model
     model = load_model(f"{MODEL_LOCATION}{MODEL_SAVE_NAME}\data_var.ckpt")
@@ -219,13 +217,17 @@ def solve_cube(input_array):
                 previous_matching = False
         
         # Backtracking (in infinite loops)
-        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0 or prediction_index > 100:
+        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0 or prediction_index > 85:
             # Reverting to last previously correct state
             predicted_solutions = predicted_solutions[0:previous_matching_index]
             prediction_index = previous_matching_index
 
             # Fetching the next predicted move
             next_correct_move = pycuber_solutions[previous_matching_index]
+
+            # Reverting cube to previous matching state
+            model_predict_cube = set_cube(pyc_cubie_form)
+            model_predict_cube(matching_solutions)
 
             # Appying the next correct move to the cubes
             model_predict_cube(next_correct_move)
@@ -256,3 +258,5 @@ def solve_cube(input_array):
             # If a different move, then just applying the move
             model_predict_cube(predicted_move)
             prediction_index += 1
+        
+        print(predicted_solutions, matching_solutions)
