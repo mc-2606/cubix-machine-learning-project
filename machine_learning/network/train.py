@@ -222,7 +222,7 @@ def initial_test_batch(training_samples:int, dataset_path:str):
     model.compile_model()
 
     # Training model + getting results
-    evals = model.train(features_train, features_val, labels_train, labels_val, epochs=3)
+    model.train(features_train, features_val, labels_train, labels_val, epochs=3)
 
 def train_modelSSS(hidden_layer_count:int, neuron_count:list, output_neuron_count:int, hidden_activation_func:str, output_activation_func:str, epochs:int, training_samples:int, file_no:int, ckpt_path:str, model_load:bool):
     # Splitting up data into training and validating batches
