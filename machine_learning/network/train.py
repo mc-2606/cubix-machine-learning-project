@@ -94,7 +94,7 @@ def load_training_data(dataset_path:str, file_no:int, limit=100):
 # Splits up data into training and valid datasets
 def split_train_valid(features, labels, valid_size, random_state):
     # Using sklearn to split up the data
-    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size)
+    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size, random_state=random_state)
 
     # Returning the training and validation data
     return x_train, x_val, y_train, y_val
