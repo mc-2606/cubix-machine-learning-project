@@ -62,7 +62,7 @@ class UserGuideWindow(QWidget):
         self.solve_info_label.setWordWrap(True)
 
         # Setting a max size
-        self.setMaximumWidth(400)
+        # self.setMaximumWidth(400)
     
     # Adds the user guide widgets
     def add_userguide_widgets(self):
