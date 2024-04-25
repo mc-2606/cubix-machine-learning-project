@@ -55,9 +55,12 @@ def solve_cube_async(scramble, scan_window):
     solutions_text = "Solutions: "
 
     # Adding move to the text label
-    for move in predicted_moves:
+    for count, move in enumerate(predicted_moves):
         solutions_text += str(move)
-        solutions_text += " "
+        solutions_text += "   "
+
+        if count % 5 == 0:
+            solutions_text += "\n"
    
     # Updating the solutions label
     solve_window.solutions_label.setText(solutions_text)

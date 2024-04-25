@@ -50,15 +50,19 @@ class UserGuideWindow(QWidget):
         # Creating the additional label info
         self.permission_info_label = QLabel()
         self.permission_info_label.setText("You will first be prompted to allow the application to use your camera. Please make sure we have access to your camera - allow our application to use it by clicking on the 'Allow Permission' button.")
-        
+        self.permission_info_label.setWordWrap(True)
+
         self.scan_info_label = QLabel()
         self.scan_info_label.setText("When scanning make sure you are scanning the right side in the right orientation. Match the colours of the side faces to the cube. When the interactive scan cube matches your real life cube you can click on the 'Scan Side' button. If you rescrambled your cube, click on the 'New Scan' button.")
+        self.scan_info_label.setWordWrap(True)
+        self.scan_info_label.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.solve_info_label = QLabel()
         self.solve_info_label.setText("When you have scanned all sides, the program will automatically start generating the solve for you. Please be patient! If you want to start a new solve, please click on the 'New Solve' button.")
+        self.solve_info_label.setWordWrap(True)
 
         # Setting a max size
-        self.setMaximumSize(500, 500)
+        self.setMaximumWidth(400)
     
     # Adds the user guide widgets
     def add_userguide_widgets(self):

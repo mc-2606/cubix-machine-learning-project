@@ -1,5 +1,5 @@
 # Imports
-from os import getcwd, listdir, makedirs
+from os import getcwd, listdir, makedirs, path
 from network.train import get_batch_split, create_load_model, create_new_model, initial_test_batch, train_model, setup_new_model, setup_load_model
 from argparse import ArgumentParser
 from sys import exit
@@ -54,7 +54,19 @@ if __name__ == '__main__':
     # Runs a training test sample
     if int(args.test):
         # Fetching amount of training samples
-        training_samples = int(args.tsamples)
+        training_samples = args.tsamples
+
+        try:
+            # Validating training samples exist
+            if int(training_samples) < 1 or int(training_samples) > 10000:
+                print("Training samples range from 1 to 10000 inclusive")
+                exit(0)
+
+            # Forces user to try again
+        except Exception as error:
+            print(f"{error}\nPlease try running the program again with valid data")
+            exit(0)
+
 
         # Running the initial test batch
         initial_test_batch(training_samples=training_samples,
@@ -77,15 +89,25 @@ if __name__ == '__main__':
         load_from_name = args.lfromloc
         save_name = args.sname
 
-        # Checking to see if save location is available (no duplicates)
+        # Checking if entered data is valid
         try:
+            # Validating training samples exist
+            if int(training_samples) < 1 or int(training_samples) > 10000:
+                print("Training samples range from 1 to 10000 inclusive")
+                exit(0)
+            
+            # Validating file exists 
+            if int(file_no) < 1 or int(file_no) > 10:
+                print("There are only 10 sets of training data [1 - 10]")
+                exit(0)
+
             # Creating new save location
             save_location = DEFAULT_CHECKPOINTS_DIR + f"/{save_name}"
             makedirs(save_location)
-        
+
         # Forces user to try again
         except Exception as error:
-            print(f"{error}\nPlease try again")
+            print(f"{error}\nPlease try running the program again with valid data")
             exit(0)
 
         # Generating batches
@@ -119,15 +141,23 @@ if __name__ == '__main__':
             setup_new_model(model)
         
         else:
-            # Loads the model
-            model = create_load_model(
-                checkpoint_path=DEFAULT_CHECKPOINTS_DIR,
-                load_from_name=load_from_name,
-                to_save_name=save_name
-                )
+            # If the loading location exists
+            if path.exists(f"{DEFAULT_CHECKPOINTS_DIR}/{str(load_from_name)}"):
+
+                # Loads the model
+                model = create_load_model(
+                    checkpoint_path=DEFAULT_CHECKPOINTS_DIR,
+                    load_from_name=load_from_name,
+                    to_save_name=save_name
+                    )
+                
+                # Settings up the loaded model
+                setup_load_model(model)
             
-            # Settings up the loaded model
-            setup_load_model(model)
+            # If the loading path does not exist
+            else:
+                print("Please load from a valid checkpoint location\n   use -sh 1 to list out the available checkpoints")
+                exit(0)
         
         # Training the model
         train_model(model=model,

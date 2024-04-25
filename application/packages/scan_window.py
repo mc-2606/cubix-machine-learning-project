@@ -221,7 +221,7 @@ class ScanWindow(QWidget):
 
         # Creating the face widget
         self.face_widget = FaceWidget()
-        self.face_widget.setFixedSize(200, 200)
+        self.face_widget.setFixedSize(300, 300)
         self.setFixedWidth(500)
 
     # Verifies that the cube has been scanned properly
@@ -275,8 +275,9 @@ class ScanWindow(QWidget):
                 else:
                     # Creating a message so that they have scanned the cube incorrectly
                     message = QMessageBox()
+                    message.setWindowTitle("Error")
                     message.setText("Error")
-                    message.setInformativeText("Please make sure you scan each side properly!")
+                    message.setInformativeText("Please make sure you scan each side properly and have good lighting!")
 
                     message.exec()
 
@@ -285,7 +286,7 @@ class ScanWindow(QWidget):
         
     # Feeds the image to view_finder to be displayed
     def update_fiewfinder(self, image):
-        image = QPixmap.fromImage(image)
+        image = QPixmap.fromImage(image).scaledToWidth(500)
         self.view_finder.setPixmap(image)
     
     # Starts the threading process

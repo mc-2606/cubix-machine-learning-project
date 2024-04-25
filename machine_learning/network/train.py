@@ -94,7 +94,7 @@ def load_training_data(dataset_path:str, file_no:int, limit=100):
 # Splits up data into training and valid datasets
 def split_train_valid(features, labels, valid_size, random_state):
     # Using sklearn to split up the data
-    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size)
+    x_train, x_val, y_train, y_val = train_test_split(features, labels, test_size=valid_size, random_state=random_state)
 
     # Returning the training and validation data
     return x_train, x_val, y_train, y_val
@@ -222,7 +222,7 @@ def initial_test_batch(training_samples:int, dataset_path:str):
     model.compile_model()
 
     # Training model + getting results
-    evals = model.train(features_train, features_val, labels_train, labels_val, epochs=3)
+    model.train(features_train, features_val, labels_train, labels_val, epochs=3)
 
 def train_modelSSS(hidden_layer_count:int, neuron_count:list, output_neuron_count:int, hidden_activation_func:str, output_activation_func:str, epochs:int, training_samples:int, file_no:int, ckpt_path:str, model_load:bool):
     # Splitting up data into training and validating batches
