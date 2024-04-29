@@ -93,12 +93,22 @@ if __name__ == '__main__':
         try:
             # Validating training samples exist
             if int(training_samples) < 1 or int(training_samples) > 10000:
-                print("Training samples range from 1 to 10000 inclusive")
+                print("Training samples range from 1 to 10000 inclusive!")
                 exit(0)
             
             # Validating file exists 
             if int(file_no) < 1 or int(file_no) > 10:
-                print("There are only 10 sets of training data [1 - 10]")
+                print("There are only 10 sets of training data [1 - 10]!")
+                exit(0)
+            
+            # Validating epoch count
+            if int(epochs) < 1:
+                print("You must have a valid number of epochs!")
+                exit(0)
+            
+            # Validating learning rate
+            if float(learning_rate) > 1:
+                print("For machine learning, results are generally better with smaller learning rates!")
                 exit(0)
 
             # Creating new save location

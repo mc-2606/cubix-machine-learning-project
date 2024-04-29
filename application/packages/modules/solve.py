@@ -31,6 +31,8 @@ LABELS = ["F", "R", "U", "L", "B", "D", "F'", "R'", "U'", "L'", "B'", "D'", "F2"
 MODEL_LOCATION = f"{getcwd()}/packages/modules/"
 MODEL_SAVE_NAME = "model_cat_10"
 
+MAX_PREDICTIONS = 90
+
 # Creating a label encode for decoding predicted values
 label_encoder = LabelEncoder()
 label_encoder.fit(LABELS)
@@ -213,7 +215,7 @@ def solve_cube(input_array):
                 previous_matching = False
         
         # Backtracking (in infinite loops)
-        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0 or prediction_index > 100:
+        if (predicted_move == f"{predicted_solutions[prediction_index-1]}'" or predicted_move == predicted_solutions[prediction_index-1]) and prediction_index > 0 or prediction_index > MAX_PREDICTIONS:
             # Reverting to last previously correct state
             predicted_solutions = predicted_solutions[0:previous_matching_index]
             prediction_index = previous_matching_index
