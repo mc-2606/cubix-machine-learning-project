@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # Runs a training test sample
     if int(args.test):
         # Fetching amount of training samples
-        training_samples = args.tsamples
+        training_samples = int(args.tsamples)
 
         try:
             # Validating training samples exist
