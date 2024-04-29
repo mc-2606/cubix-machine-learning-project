@@ -1,0 +1,7 @@
+Welcome to my CUBIX project.
+
+The documentation is stored in 'CUBIX doc.pdf' with references to the provided videos.
+
+To run the application, collapse into applcation and run from main.py - imports won't work otherwise.
+To run the training program, use python machine_learning/main.py -h for more details on running options
+To run the training program, collapse into the dataset_gen folder and use python gendataset.py -h for more details on running options
