@@ -163,5 +163,3 @@ class Model:
         prediction = self.model.predict(cube_input)
 
         return prediction
-
-
