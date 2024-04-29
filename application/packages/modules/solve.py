@@ -198,8 +198,7 @@ def solve_cube(input_array):
         predicted_solutions.append(predicted_move)
 
         # If the move predicted has been solved
-        if predicted_move == "S" and (test:= verify_solve(predicted_solutions, verify_cube)):
-            print("YESSEUDHISHD", test)
+        if predicted_move == "S" and verify_solve(predicted_solutions, verify_cube):
             return predicted_solutions
         else:
             # Reverting verify cube to original state

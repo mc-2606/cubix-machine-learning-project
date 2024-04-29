@@ -257,3 +257,9 @@ def train_modelSSS(hidden_layer_count:int, neuron_count:list, output_neuron_coun
     # Training model + getting results
     evals = model.train(features_train, features_val, labels_train, labels_val, epochs=epochs)
     model.plot_history(evals)
+
+
+
+# features, labels = load_training_data("C:\project\project\machine_learning\dataset_gen\datasets/", 1, limit=5)
+# split_data = split_train_valid(features, labels, 0.2, 1)
+
